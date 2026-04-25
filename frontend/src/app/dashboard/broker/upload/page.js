@@ -6,7 +6,7 @@ import {
   Package, Upload, Globe, DollarSign, 
   Layout, FileText, Sparkles, ArrowLeft, 
   Image as ImageIcon, Clipboard, CheckCircle2,
-  FolderOpen, Smartphone, Zap
+  FolderOpen, Smartphone, Zap, ChevronRight
 } from 'lucide-react';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
