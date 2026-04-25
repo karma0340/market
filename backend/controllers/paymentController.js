@@ -45,13 +45,16 @@ const initiatePayment = async (req, res, next) => {
     let paymentData = {};
 
     switch (paymentType) {
-      case 'razorpay':
-        // Assuming product.price is in INR
-        const rzOrder = await createRazorpayOrder(product.price, order._id.toString());
-        order.paymentId = rzOrder.id; // Store Razorpay order ID temporarily
+      case 'razorpay': {
+        // Convert USD price to INR (Razorpay only accepts INR for Indian accounts)
+        const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
+        const priceInINR = Math.round(product.price * USD_TO_INR);
+        const rzOrder = await createRazorpayOrder(priceInINR, order._id.toString());
+        order.paymentId = rzOrder.id;
         await order.save();
         paymentData = { pgOrderId: rzOrder.id, currency: rzOrder.currency, amount: rzOrder.amount };
         break;
+      }
 
       case 'stripe':
         const session = await createStripeCheckoutSession(product, order._id.toString());
