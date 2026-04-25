@@ -13,7 +13,7 @@ export default function CartPage() {
   const { items, removeFromCart, getCartTotal, clearCart } = useCartStore();
   const { user } = useAuthStore();
   const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState('stripe');
+  const [paymentMethod, setPaymentMethod] = useState('crypto');
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -188,33 +188,26 @@ export default function CartPage() {
 
               <div className="mt-10">
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Payment Method</label>
-                <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                  <button 
-                    onClick={() => setPaymentMethod('razorpay')}
-                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                      paymentMethod === 'razorpay' ? 'bg-indigo-600/20 border-indigo-500 ring-2 ring-indigo-500/50' : 'bg-white/5 border-white/5 hover:bg-white/10'
-                    }`}
-                  >
-                    <Landmark className={`h-5 w-5 sm:h-6 sm:w-6 ${paymentMethod === 'razorpay' ? 'text-indigo-400' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-black text-white uppercase tracking-widest">India</span>
-                  </button>
-                  <button 
-                    onClick={() => setPaymentMethod('stripe')}
-                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                      paymentMethod === 'stripe' ? 'bg-indigo-600/20 border-indigo-500 ring-2 ring-indigo-500/50' : 'bg-white/5 border-white/5 hover:bg-white/10'
-                    }`}
-                  >
-                    <CreditCard className={`h-5 w-5 sm:h-6 sm:w-6 ${paymentMethod === 'stripe' ? 'text-indigo-400' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-black text-white uppercase tracking-widest">Global</span>
-                  </button>
+                <div className="grid grid-cols-1 gap-2 sm:gap-4">
+                  {/* Razorpay and Stripe disabled for now */}
                   <button 
                     onClick={() => setPaymentMethod('crypto')}
-                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                      paymentMethod === 'crypto' ? 'bg-purple-600/20 border-purple-500 ring-2 ring-purple-500/50' : 'bg-white/5 border-white/5 hover:bg-white/10'
+                    className={`p-4 sm:p-6 rounded-[28px] border flex items-center justify-between transition-all ${
+                      paymentMethod === 'crypto' ? 'bg-purple-600/20 border-purple-500 ring-4 ring-purple-500/20' : 'bg-white/5 border-white/5 hover:bg-white/10'
                     }`}
                   >
-                    <ShieldCheck className={`h-5 w-5 sm:h-6 sm:w-6 ${paymentMethod === 'crypto' ? 'text-purple-400' : 'text-slate-500'}`} />
-                    <span className="text-[8px] sm:text-[10px] font-black text-white uppercase tracking-widest">Crypto</span>
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl ${paymentMethod === 'crypto' ? 'bg-purple-500 text-white' : 'bg-white/5 text-slate-500'}`}>
+                        <ShieldCheck className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block text-xs font-black text-white uppercase tracking-widest">Crypto Payment</span>
+                        <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-tighter">BTC, USDT, ETH & More</span>
+                      </div>
+                    </div>
+                    <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'crypto' ? 'border-purple-500 bg-purple-500' : 'border-white/10'}`}>
+                      {paymentMethod === 'crypto' && <Zap className="h-3 w-3 text-white fill-current" />}
+                    </div>
                   </button>
                 </div>
               </div>
