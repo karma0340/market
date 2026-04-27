@@ -7,69 +7,86 @@ const { createRazorpayOrder, verifyRazorpaySignature } = require('../services/ra
 const { createStripeCheckoutSession, constructStripeEvent } = require('../services/stripeService');
 const { createCryptoInvoice, verifyNowPaymentsSignature } = require('../services/nowpaymentsService');
 
-// @desc    Initiate payment for a product
+// @desc    Initiate payment for multiple products
 // @route   POST /api/payments/initiate
 // @access  Private/User
 const initiatePayment = async (req, res, next) => {
   try {
-    const { productId, paymentType } = req.body;
+    const { productIds, paymentType } = req.body;
     const userId = req.user._id;
 
-    if (!productId || !paymentType) {
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0 || !paymentType) {
       res.status(400);
-      return next(new Error('Please provide productId and paymentType'));
+      return next(new Error('Please provide productIds (array) and paymentType'));
     }
 
-    const product = await Product.findById(productId);
-    if (!product || product.status !== 'approved') {
+    const products = await Product.find({ _id: { $in: productIds }, status: 'approved' });
+    if (products.length !== productIds.length) {
       res.status(404);
-      return next(new Error('Product not found or not approved'));
+      return next(new Error('One or more products not found or not approved'));
     }
 
-    // Check if user already purchased this product
-    const existingOrder = await Order.findOne({ userId, productId, status: 'paid' });
-    if (existingOrder) {
+    // Check if user already purchased any of these products
+    const existingOrders = await Order.find({ 
+      userId, 
+      productId: { $in: productIds }, 
+      status: 'paid' 
+    }).populate('productId', 'title');
+
+    if (existingOrders.length > 0) {
+      const titles = existingOrders.map(o => o.productId.title).join(', ');
       res.status(400);
-      return next(new Error('You have already purchased this product'));
+      return next(new Error(`You have already purchased: ${titles}`));
     }
 
-    // Create a pending order
-    const order = await Order.create({
-      userId,
-      productId,
-      paymentType,
-      amount: product.price,
-      status: 'pending'
-    });
+    const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
 
+    // Create pending orders for all products
+    const orders = await Promise.all(products.map(product => 
+      Order.create({
+        userId,
+        productId: product._id,
+        paymentType,
+        amount: product.price,
+        status: 'pending'
+      })
+    ));
+
+    const tempPaymentId = `TEMP_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     let paymentData = {};
 
     switch (paymentType) {
       case 'razorpay': {
-        // Convert USD price to INR (Razorpay only accepts INR for Indian accounts)
         const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
-        const priceInINR = Math.round(product.price * USD_TO_INR);
-        const rzOrder = await createRazorpayOrder(priceInINR, order._id.toString());
-        order.paymentId = rzOrder.id;
-        await order.save();
+        const totalInINR = Math.round(totalPrice * USD_TO_INR);
+        const rzOrder = await createRazorpayOrder(totalInINR, tempPaymentId);
+        
+        // Update all orders with the Razorpay order ID
+        await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: rzOrder.id });
+        
         paymentData = { pgOrderId: rzOrder.id, currency: rzOrder.currency, amount: rzOrder.amount };
         break;
       }
 
-      case 'stripe':
-        const session = await createStripeCheckoutSession(product, order._id.toString());
-        order.paymentId = session.id;
-        await order.save();
+      case 'stripe': {
+        const session = await createStripeCheckoutSession(products, tempPaymentId);
+        
+        // Update all orders with the Stripe Session ID
+        await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: session.id });
+        
         paymentData = { url: session.url };
         break;
+      }
 
-      case 'crypto':
-        // Assuming price is USD equivalent
-        const invoice = await createCryptoInvoice(product.price, order._id.toString(), `Payment for ${product.title}`);
-        order.paymentId = invoice.invoice_id;
-        await order.save();
+      case 'crypto': {
+        const invoice = await createCryptoInvoice(totalPrice, tempPaymentId, `Bulk purchase of ${products.length} items`);
+        
+        // Update all orders with the NOWPayments Invoice ID
+        await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: invoice.invoice_id });
+        
         paymentData = { invoiceUrl: invoice.invoice_url };
         break;
+      }
 
       default:
         res.status(400);
@@ -77,7 +94,7 @@ const initiatePayment = async (req, res, next) => {
     }
 
     res.json({
-      orderId: order._id,
+      orderIds: orders.map(o => o._id),
       paymentType,
       ...paymentData
     });
@@ -89,52 +106,64 @@ const initiatePayment = async (req, res, next) => {
 };
 
 // Helper function to handle commission split and wallet updates on successful payment
-const processSuccessfulPayment = async (orderId, actualPaymentId) => {
-  const order = await Order.findById(orderId).populate('productId');
-  if (!order || order.status === 'paid') return; // Already processed
-
-  order.status = 'paid';
-  if (actualPaymentId) {
-    order.paymentId = actualPaymentId;
+const processSuccessfulPayment = async (paymentId, actualPGId) => {
+  // Find all orders linked to this payment ID
+  const orders = await Order.find({ paymentId, status: 'pending' }).populate('productId');
+  
+  if (orders.length === 0) {
+    console.log(`[PAYMENT] No pending orders found for paymentId: ${paymentId}`);
+    return;
   }
-  await order.save();
 
-  // Commission System (20% platform fee)
   const COMMISSION_PERCENTAGE = Number(process.env.COMMISSION_PERCENTAGE) || 20;
-  const platformFee = (order.amount * COMMISSION_PERCENTAGE) / 100;
-  const sellerEarnings = order.amount - platformFee;
 
-  // Update Broker Wallet (Add to pending for 7-day clearance)
-  const sellerId = order.productId.sellerId;
-  const seller = await User.findById(sellerId);
-  if (seller) {
-    seller.wallet.pending += sellerEarnings;
-    await seller.save();
-  }
-
-  // Record Transactions
-  await Transaction.create([
-    {
-      userId: order.userId,
-      amount: order.amount,
-      type: 'payment',
-      status: 'completed'
-    },
-    {
-      userId: sellerId,
-      amount: sellerEarnings,
-      type: 'commission',
-      status: 'completed'
+  for (const order of orders) {
+    order.status = 'paid';
+    if (actualPGId) {
+      order.paymentId = actualPGId; // Update to actual payment ID if provided
     }
-  ]);
+    await order.save();
+
+    // Commission System
+    const platformFee = (order.amount * COMMISSION_PERCENTAGE) / 100;
+    const sellerEarnings = order.amount - platformFee;
+
+    // Update Broker Wallet
+    const sellerId = order.productId.sellerId;
+    const seller = await User.findById(sellerId);
+    if (seller) {
+      seller.wallet.pending += sellerEarnings;
+      await seller.save();
+    }
+
+    // Record Transactions
+    await Transaction.create([
+      {
+        userId: order.userId,
+        amount: order.amount,
+        type: 'payment',
+        status: 'completed',
+        note: `Payment for ${order.productId.title}`
+      },
+      {
+        userId: sellerId,
+        amount: sellerEarnings,
+        type: 'commission',
+        status: 'completed',
+        note: `Commission from ${order.productId.title}`
+      }
+    ]);
+  }
+  
+  console.log(`[PAYMENT] Successfully processed ${orders.length} orders for paymentId: ${paymentId}`);
 };
 
-// @desc    Verify Razorpay payment
+// @desc    Verify Razorpay payment (Client-side trigger)
 // @route   POST /api/payments/razorpay/verify
 // @access  Private/User
 const verifyRazorpay = async (req, res, next) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, dbOrderId } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     const isValid = verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
 
@@ -143,7 +172,7 @@ const verifyRazorpay = async (req, res, next) => {
       return next(new Error('Invalid signature'));
     }
 
-    await processSuccessfulPayment(dbOrderId, razorpay_payment_id);
+    await processSuccessfulPayment(razorpay_order_id, razorpay_payment_id);
     res.json({ success: true, message: 'Payment verified successfully' });
   } catch (error) {
     next(error);
@@ -167,8 +196,9 @@ const stripeWebhook = async (req, res, next) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const orderId = session.metadata.orderId;
-    await processSuccessfulPayment(orderId, session.id);
+    const paymentId = session.metadata.paymentId;
+    // For Stripe, we use the session.id as the final paymentId in DB
+    await processSuccessfulPayment(paymentId, session.id);
   }
 
   res.send();
@@ -198,9 +228,47 @@ const nowpaymentsWebhook = async (req, res, next) => {
   }
 };
 
+// @desc    Razorpay Webhook
+// @route   POST /api/payments/razorpay/webhook
+// @access  Public
+const razorpayWebhook = async (req, res, next) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    // Verify webhook signature using the raw body
+    const crypto = require('crypto');
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(req.body) // req.body is a Buffer from express.raw()
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      console.error('[RAZORPAY] Invalid webhook signature');
+      return res.status(400).send('Invalid signature');
+    }
+
+    // Now parse the body since we used express.raw()
+    const body = JSON.parse(req.body.toString());
+    const { event, payload } = body;
+
+    if (event === 'order.paid') {
+      const rzOrder = payload.order.entity;
+      console.log(`[RAZORPAY] Webhook received: order.paid for ${rzOrder.id}`);
+      await processSuccessfulPayment(rzOrder.id, payload.payment.entity.id);
+    }
+
+    res.send({ status: 'ok' });
+  } catch (error) {
+    console.error('Razorpay Webhook Error:', error);
+    res.status(500).send('Webhook failed');
+  }
+};
+
 module.exports = {
   initiatePayment,
   verifyRazorpay,
   stripeWebhook,
+  razorpayWebhook,
   nowpaymentsWebhook
 };

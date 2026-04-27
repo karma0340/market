@@ -26,9 +26,10 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 
-// --- STRIPE WEBHOOK NEEDS RAW BODY ---
-// Mount this route before express.json()
+// --- WEBHOOKS NEED RAW BODY ---
+// Mount these routes before express.json()
 app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }), require('./controllers/paymentController').stripeWebhook);
+app.use('/api/payments/razorpay/webhook', express.raw({ type: 'application/json' }), require('./controllers/paymentController').razorpayWebhook);
 
 // Now apply express.json() for all other routes
 app.use(express.json());

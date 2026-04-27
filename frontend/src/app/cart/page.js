@@ -29,18 +29,17 @@ export default function CartPage() {
   const handleRazorpayPayment = async (orderData) => {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: orderData.amount * 100,
+      amount: orderData.amount,
       currency: "INR",
       name: "Digital Market",
-      description: "Secure Digital Acquisition",
+      description: `Secure Acquisition of ${items.length} Assets`,
       order_id: orderData.pgOrderId,
       handler: async function (response) {
         try {
           await api.post('/payments/razorpay/verify', {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            dbOrderId: orderData.orderId
+            razorpay_signature: response.razorpay_signature
           });
           toast.success('Payment Verified! Redirecting...');
           clearCart();
@@ -74,10 +73,10 @@ export default function CartPage() {
 
     setIsProcessing(true);
     try {
-      const item = items[0]; 
+      const productIds = items.map(item => item.product._id);
       
       const { data } = await api.post('/payments/initiate', {
-        productId: item.product._id,
+        productIds,
         paymentType: paymentMethod
       });
 
@@ -189,7 +188,46 @@ export default function CartPage() {
               <div className="mt-10">
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Payment Method</label>
                 <div className="grid grid-cols-1 gap-2 sm:gap-4">
-                  {/* Razorpay and Stripe disabled for now */}
+                  <button 
+                    onClick={() => setPaymentMethod('stripe')}
+                    className={`p-4 sm:p-6 rounded-[28px] border flex items-center justify-between transition-all ${
+                      paymentMethod === 'stripe' ? 'bg-indigo-600/20 border-indigo-500 ring-4 ring-indigo-500/20' : 'bg-white/5 border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl ${paymentMethod === 'stripe' ? 'bg-indigo-500 text-white' : 'bg-white/5 text-slate-500'}`}>
+                        <CreditCard className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block text-xs font-black text-white uppercase tracking-widest">Card Payment</span>
+                        <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Powered by Stripe</span>
+                      </div>
+                    </div>
+                    <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'stripe' ? 'border-indigo-500 bg-indigo-500' : 'border-white/10'}`}>
+                      {paymentMethod === 'stripe' && <Zap className="h-3 w-3 text-white fill-current" />}
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => setPaymentMethod('razorpay')}
+                    className={`p-4 sm:p-6 rounded-[28px] border flex items-center justify-between transition-all ${
+                      paymentMethod === 'razorpay' ? 'bg-blue-600/20 border-blue-500 ring-4 ring-blue-500/20' : 'bg-white/5 border-white/5 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl ${paymentMethod === 'razorpay' ? 'bg-blue-500 text-white' : 'bg-white/5 text-slate-500'}`}>
+                        <Landmark className="h-6 w-6" />
+                      </div>
+                      <div className="text-left">
+                        <span className="block text-xs font-black text-white uppercase tracking-widest">Instant Pay</span>
+                        <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Razorpay, UPI, Netbanking</span>
+                      </div>
+                    </div>
+                    <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'razorpay' ? 'border-blue-500 bg-blue-500' : 'border-white/10'}`}>
+                      {paymentMethod === 'razorpay' && <Zap className="h-3 w-3 text-white fill-current" />}
+                    </div>
+                  </button>
+
                   <button 
                     onClick={() => setPaymentMethod('crypto')}
                     className={`p-4 sm:p-6 rounded-[28px] border flex items-center justify-between transition-all ${

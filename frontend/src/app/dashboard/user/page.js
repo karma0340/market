@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useCartStore } from '@/store/useCartStore';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { 
@@ -14,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function UserDashboard() {
   const { user } = useAuthStore();
+  const { clearCart } = useCartStore();
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -42,6 +44,7 @@ export default function UserDashboard() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success')) {
+      clearCart();
       toast.success('Acquisition Successful! Welcome to the elite.', {
         icon: '💎',
         duration: 5000
