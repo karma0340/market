@@ -5,7 +5,11 @@ const Order = require('../models/Order');
 // @access  Private/User
 const getMyOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find({ userId: req.user._id }).populate('productId', 'title price images');
+    // Only return paid orders so unpaid attempts don't show up in the user's library
+    const orders = await Order.find({ 
+      userId: req.user._id, 
+      status: 'paid' 
+    }).populate('productId', 'title price images');
     res.json(orders);
   } catch (error) {
     next(error);
