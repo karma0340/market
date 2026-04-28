@@ -6,7 +6,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { 
   ShoppingCart, User, LogOut, Package, Menu, X, 
   Sparkles, ChevronDown, BookOpen, LayoutGrid, 
-  PlusCircle, Wallet, Settings, ShieldCheck
+  PlusCircle, Wallet, Settings, ShieldCheck, DollarSign
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,6 +60,7 @@ export default function Navbar() {
             
             <div className="hidden md:flex items-center gap-8">
               <Link href="/products" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Marketplace</Link>
+              <Link href="/pricing" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Pricing</Link>
               <Link href="/about" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Company</Link>
             </div>
           </div>
@@ -234,6 +235,9 @@ export default function Navbar() {
               <div className="space-y-4">
                 <Link href="/products" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-sm font-black text-slate-300 uppercase tracking-widest hover:text-white">
                   <Package className="h-5 w-5 text-indigo-400" /> Marketplace
+                </Link>
+                <Link href="/pricing" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-sm font-black text-slate-300 uppercase tracking-widest hover:text-white">
+                  <DollarSign className="h-5 w-5 text-green-400" /> Pricing
                 </Link>
                 <Link href="/about" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-sm font-black text-slate-300 uppercase tracking-widest hover:text-white">
                   <Sparkles className="h-5 w-5 text-purple-400" /> Company

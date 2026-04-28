@@ -34,6 +34,7 @@ export default function Footer() {
                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">Marketplace</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li><Link href="/products" className="text-sm text-slate-400 hover:text-white transition-colors">Browse Assets</Link></li>
+                  <li><Link href="/pricing" className="text-sm text-slate-400 hover:text-white transition-colors">Pricing</Link></li>
                   <li><Link href="/register" className="text-sm text-slate-400 hover:text-white transition-colors">Start Selling</Link></li>
                   <li><Link href="/login" className="text-sm text-slate-400 hover:text-white transition-colors">Creator Login</Link></li>
                 </ul>
