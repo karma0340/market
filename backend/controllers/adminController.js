@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const Order = require('../models/Order');
 const { executeCryptoPayout } = require('../services/nowpaymentsService');
 
 // @desc    Get all pending products
@@ -141,6 +142,21 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+// @desc    Get all orders (customer payments)
+// @route   GET /api/admin/orders
+// @access  Private/Admin
+const getAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({})
+      .populate('userId', 'name email')
+      .populate('productId', 'title')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getPendingProducts,
   getAllProducts,
@@ -148,5 +164,6 @@ module.exports = {
   deleteProduct,
   getWithdrawalRequests,
   approveWithdrawal,
-  getUsers
+  getUsers,
+  getAllOrders
 };

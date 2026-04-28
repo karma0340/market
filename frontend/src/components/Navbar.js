@@ -115,6 +115,44 @@ export default function Navbar() {
                                 <span className="text-xs font-bold uppercase tracking-widest">My Library</span>
                               </Link>
                             </>
+                          ) : user.role === 'admin' ? (
+                            <div className="space-y-4">
+                              <div>
+                                <p className="px-4 text-[8px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-1">System Governance</p>
+                                <Link 
+                                  href="/dashboard/admin" 
+                                  onClick={() => setIsProfileOpen(false)}
+                                  className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                  <ShieldCheck className="h-4 w-4 text-indigo-400" />
+                                  <span className="text-xs font-bold uppercase tracking-widest">Command Hub</span>
+                                </Link>
+                              </div>
+                              
+                              <div>
+                                <p className="px-4 text-[8px] font-black text-purple-500 uppercase tracking-[0.2em] mb-1">Brokerage Terminal</p>
+                                <Link 
+                                  href="/dashboard/broker" 
+                                  onClick={() => setIsProfileOpen(false)}
+                                  className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                  <LayoutGrid className="h-4 w-4 text-purple-400" />
+                                  <span className="text-xs font-bold uppercase tracking-widest">Broker Vault</span>
+                                </Link>
+                              </div>
+
+                              <div>
+                                <p className="px-4 text-[8px] font-black text-green-500 uppercase tracking-[0.2em] mb-1">Personal Vault</p>
+                                <Link 
+                                  href="/dashboard/user" 
+                                  onClick={() => setIsProfileOpen(false)}
+                                  className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                  <BookOpen className="h-4 w-4 text-green-400" />
+                                  <span className="text-xs font-bold uppercase tracking-widest">My Library</span>
+                                </Link>
+                              </div>
+                            </div>
                           ) : (
                             <>
                               <Link 
@@ -223,6 +261,23 @@ export default function Navbar() {
                       >
                         <BookOpen className="h-4 w-4" /> My Library
                       </Link>
+                    ) : user.role === 'admin' ? (
+                      <>
+                        <Link 
+                          href="/dashboard/admin" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-4 py-2 text-indigo-400 text-[10px] font-black uppercase tracking-widest"
+                        >
+                          <ShieldCheck className="h-4 w-4" /> Admin Hub
+                        </Link>
+                        <Link 
+                          href="/dashboard/broker" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-4 py-2 text-purple-400 text-[10px] font-black uppercase tracking-widest"
+                        >
+                          <LayoutGrid className="h-4 w-4" /> Broker Vault
+                        </Link>
+                      </>
                     ) : (
                       <>
                         <Link 

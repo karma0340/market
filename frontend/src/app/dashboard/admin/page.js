@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const { user } = useAuthStore();
   const [allProducts, setAllProducts] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -45,12 +46,14 @@ export default function AdminDashboard() {
   const fetchData = async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
-      const [productsRes, withdrawalsRes] = await Promise.all([
+      const [productsRes, withdrawalsRes, ordersRes] = await Promise.all([
         api.get('/admin/products'),
-        api.get('/admin/withdrawals')
+        api.get('/admin/withdrawals'),
+        api.get('/admin/orders')
       ]);
       setAllProducts(productsRes.data);
       setWithdrawals(withdrawalsRes.data);
+      setAllOrders(ordersRes.data);
     } catch (error) {
       if (!silent) toast.error('Failed to load administrative data');
     } finally {
@@ -151,6 +154,17 @@ export default function AdminDashboard() {
           
           <div className="glass p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] border border-white/5 relative overflow-hidden group">
             <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <TrendingUp className="h-24 w-24 sm:h-32 sm:w-32 text-white" />
+            </div>
+            <div className="text-[9px] sm:text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-2 sm:mb-4 flex items-center gap-2">
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" /> Global Sales
+            </div>
+            <div className="text-3xl sm:text-5xl font-black text-white mb-1 sm:mb-2">{allOrders.length}</div>
+            <div className="text-[9px] sm:text-xs text-green-400 font-bold">Total Platform Volume</div>
+          </div>
+
+          <div className="glass p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] border border-white/5 relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <DollarSign className="h-24 w-24 sm:h-32 sm:w-32 text-white" />
             </div>
             <div className="text-[9px] sm:text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-2 sm:mb-4 flex items-center gap-2">
@@ -187,6 +201,14 @@ export default function AdminDashboard() {
               }`}
             >
               <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Payouts
+            </button>
+            <button 
+              onClick={() => setActiveTab('transactions')}
+              className={`flex-1 py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
+                activeTab === 'transactions' ? 'text-white bg-green-600/20 border-b-2 border-green-500' : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Transactions
             </button>
           </div>
 
@@ -298,6 +320,39 @@ export default function AdminDashboard() {
                       >
                         Finalize
                       </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {activeTab === 'transactions' && (
+              <div className="space-y-4">
+                <div className="hidden md:grid grid-cols-5 gap-4 px-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
+                  <div>Customer</div>
+                  <div>Product</div>
+                  <div>Method</div>
+                  <div>Amount</div>
+                  <div>Status</div>
+                </div>
+                {allOrders.length === 0 ? (
+                  <div className="text-center py-20">
+                    <h3 className="text-xl font-black text-white">No Sales Yet.</h3>
+                  </div>
+                ) : allOrders.map((order) => (
+                  <div key={order._id} className="bg-white/[0.03] p-6 rounded-3xl border border-white/5 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                    <div className="flex flex-col">
+                      <span className="text-white font-bold truncate">{order.userId?.name || 'Anonymous'}</span>
+                      <span className="text-[10px] text-slate-500">{order.userId?.email}</span>
+                    </div>
+                    <div className="text-slate-300 font-medium truncate">{order.productId?.title}</div>
+                    <div className="uppercase text-[10px] font-black text-indigo-400 tracking-widest">{order.paymentType}</div>
+                    <div className="text-white font-black">${order.amount}</div>
+                    <div>
+                      <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                        order.status === 'paid' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-500'
+                      }`}>
+                        {order.status}
+                      </span>
                     </div>
                   </div>
                 ))}

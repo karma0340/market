@@ -7,7 +7,8 @@ const {
   deleteProduct,
   getWithdrawalRequests, 
   approveWithdrawal,
-  getUsers 
+  getUsers,
+  getAllOrders 
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 
@@ -20,6 +21,8 @@ router.delete('/products/:id', deleteProduct);
 
 router.get('/withdrawals', getWithdrawalRequests);
 router.put('/withdrawals/:id/approve', approveWithdrawal);
+
+router.get('/orders', getAllOrders);
 
 router.get('/users', getUsers);
 

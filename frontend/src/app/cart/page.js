@@ -15,6 +15,7 @@ export default function CartPage() {
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState('crypto');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAcceptedTOS, setIsAcceptedTOS] = useState(false);
 
   useEffect(() => {
     // Load Razorpay Script
@@ -82,6 +83,11 @@ export default function CartPage() {
     }
 
     if (items.length === 0) return;
+    
+    if (!isAcceptedTOS) {
+      toast.error('Please accept the Terms of Service to proceed.');
+      return;
+    }
 
     setIsProcessing(true);
     try {
@@ -262,10 +268,25 @@ export default function CartPage() {
                 </div>
               </div>
 
+              <div className="mt-8 space-y-4">
+                <div className="flex items-start gap-3 p-4 bg-white/5 rounded-2xl border border-white/5 group cursor-pointer hover:bg-white/10 transition-all">
+                  <input 
+                    type="checkbox" 
+                    id="tos" 
+                    checked={isAcceptedTOS}
+                    onChange={(e) => setIsAcceptedTOS(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900 text-indigo-600 focus:ring-indigo-500" 
+                  />
+                  <label htmlFor="tos" className="text-[10px] sm:text-xs text-slate-400 font-medium leading-relaxed cursor-pointer select-none">
+                    I acknowledge that these are <span className="text-white font-bold">Digital Assets</span> and agree to the <span className="text-indigo-400 underline">Terms of Service</span>. I understand that all sales are final and non-refundable once the download is initiated.
+                  </label>
+                </div>
+              </div>
+
               <button
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="mt-12 w-full py-6 rounded-[24px] bg-white text-slate-950 text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 group"
+                className="mt-6 w-full py-6 rounded-[24px] bg-white text-slate-950 text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3 group"
               >
                 {isProcessing ? (
                   <div className="flex items-center gap-2">
