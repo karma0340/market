@@ -56,9 +56,21 @@ export default function CartPage() {
       theme: {
         color: "#6366f1",
       },
+      modal: {
+        ondismiss: function() {
+          setIsProcessing(false);
+          toast.error('Payment cancelled by user');
+        }
+      }
     };
 
     const rzp1 = new window.Razorpay(options);
+    
+    rzp1.on('payment.failed', function (response) {
+      setIsProcessing(false);
+      toast.error(`Payment failed: ${response.error.description}`);
+    });
+
     rzp1.open();
   };
 

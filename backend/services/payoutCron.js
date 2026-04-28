@@ -44,6 +44,11 @@ const startAutomatedPayouts = () => {
       }
 
       // 3. Process Crypto Payouts
+      if (!process.env.NOWPAYMENTS_JWT_TOKEN) {
+        console.log('[CRON] Skipping crypto payouts: NOWPAYMENTS_JWT_TOKEN not set.');
+        return;
+      }
+
       const pendingWithdrawals = await Transaction.find({ type: 'withdrawal', status: 'pending' }).populate('userId');
       
       for (const req of pendingWithdrawals) {

@@ -31,9 +31,9 @@ const walletRoutes = require('./routes/walletRoutes');
 app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }), require('./controllers/paymentController').stripeWebhook);
 app.use('/api/payments/razorpay/webhook', express.raw({ type: 'application/json' }), require('./controllers/paymentController').razorpayWebhook);
 
-// Now apply express.json() for all other routes
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Now apply express.json() with increased limit for large uploads (Base64 images, etc)
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 // Basic route
 app.get('/', (req, res) => {

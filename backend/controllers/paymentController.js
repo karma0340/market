@@ -59,6 +59,13 @@ const initiatePayment = async (req, res, next) => {
       case 'razorpay': {
         const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
         const totalInINR = Math.round(totalPrice * USD_TO_INR);
+        const totalInPaise = totalInINR * 100;
+
+        if (totalInPaise < 100) {
+          res.status(400);
+          return next(new Error('Minimum amount for Razorpay is ₹1 (100 paise)'));
+        }
+
         const rzOrder = await createRazorpayOrder(totalInINR, tempPaymentId);
         
         // Update all orders with the Razorpay order ID
@@ -165,11 +172,16 @@ const verifyRazorpay = async (req, res, next) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      res.status(400);
+      return next(new Error('Missing required Razorpay fields'));
+    }
+
     const isValid = verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
 
     if (!isValid) {
       res.status(400);
-      return next(new Error('Invalid signature'));
+      return next(new Error('Invalid Razorpay signature'));
     }
 
     await processSuccessfulPayment(razorpay_order_id, razorpay_payment_id);

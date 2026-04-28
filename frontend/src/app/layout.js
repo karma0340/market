@@ -20,7 +20,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${outfit.variable} font-sans`} suppressHydrationWarning>
+    <html lang="en" className={`${outfit.variable} font-sans`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="antialiased min-h-screen flex flex-col bg-slate-50" suppressHydrationWarning>
         <SmoothScroll>
           <Toaster 

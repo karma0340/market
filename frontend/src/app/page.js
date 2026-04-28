@@ -57,8 +57,8 @@ export default function Home() {
                   alt="Marketplace Interface" 
                   width={800}
                   height={500}
-                  className="rounded-[32px] shadow-2xl w-full h-[500px] object-cover"
-                  priority={false}
+                  className="rounded-[32px] shadow-2xl w-full h-auto object-cover"
+                  priority={true}
                 />
                 
                 {/* Floating Stats UI */}
