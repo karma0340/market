@@ -92,6 +92,8 @@ export default function AdminDashboard() {
     }
   };
 
+  const getCurrencySymbol = (currency) => currency === 'INR' ? '₹' : '$';
+
   if (!mounted) return null;
 
   if (!user || user.role !== 'admin') {
@@ -243,7 +245,7 @@ export default function AdminDashboard() {
                         <p className="text-[10px] sm:text-sm text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1">
                           Creator: <span className="text-white font-bold">{product.sellerId?.name}</span>
                           <span className="hidden sm:inline">•</span>
-                          Price: <span className="text-indigo-400 font-black">${product.price}</span>
+                          Price: <span className="text-indigo-400 font-black">{getCurrencySymbol(product.currency)}{product.price}</span>
                         </p>
                       </div>
                     </div>
@@ -346,7 +348,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="text-slate-300 font-medium truncate">{order.productId?.title}</div>
                     <div className="uppercase text-[10px] font-black text-indigo-400 tracking-widest">{order.paymentType}</div>
-                    <div className="text-white font-black">${order.amount}</div>
+                    <div className="text-white font-black">{getCurrencySymbol(order.currency)}{order.amount}</div>
                     <div>
                       <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${
                         order.status === 'paid' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-500'
@@ -400,7 +402,7 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Price</div>
-                      <div className="text-3xl font-black text-white">${selectedProduct.price}</div>
+                      <div className="text-3xl font-black text-white">{getCurrencySymbol(selectedProduct.currency)}{selectedProduct.price}</div>
                     </div>
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Category</div>
@@ -451,7 +453,7 @@ export default function AdminDashboard() {
               
               <div className="bg-purple-600/10 p-8 rounded-[24px] border border-purple-500/20 text-center mb-8">
                 <div className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-2">Requested Amount</div>
-                <div className="text-5xl font-black text-white tracking-tighter">${selectedPayout.amount.toFixed(2)}</div>
+                <div className="text-5xl font-black text-white tracking-tighter">{getCurrencySymbol(selectedPayout.userId?.payoutMethod?.includes('INR') ? 'INR' : 'USD')}{selectedPayout.amount.toFixed(2)}</div>
                 <div className="text-xs text-slate-400 mt-2">Date: {new Date(selectedPayout.createdAt).toLocaleString()}</div>
               </div>
 

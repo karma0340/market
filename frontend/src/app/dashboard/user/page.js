@@ -98,6 +98,8 @@ export default function UserDashboard() {
     }
   };
 
+  const getCurrencySymbol = (currency) => currency === 'INR' ? '₹' : '$';
+
   const formatOrderTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -196,7 +198,8 @@ export default function UserDashboard() {
                   </div>
                   <div className="bg-white/[0.03] p-5 rounded-3xl border border-white/5 text-center hover:bg-white/[0.05] transition-all">
                     <div className="text-2xl sm:text-3xl font-black text-indigo-400 mb-1">
-                      ${orders.reduce((acc, curr) => acc + curr.amount, 0).toFixed(0)}
+                      ${orders.filter(o => o.currency !== 'INR').reduce((acc, curr) => acc + curr.amount, 0).toFixed(0)}
+                      {orders.some(o => o.currency === 'INR') && ` + ₹${orders.filter(o => o.currency === 'INR').reduce((acc, curr) => acc + curr.amount, 0).toFixed(0)}`}
                     </div>
                     <div className="text-[8px] sm:text-[9px] uppercase font-black text-slate-500 tracking-[0.2em]">Investment</div>
                   </div>
@@ -290,7 +293,7 @@ export default function UserDashboard() {
                         <div className="flex items-center gap-4 sm:gap-8 flex-shrink-0 pr-2">
                           <div className="text-right hidden sm:block">
                             <div className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-0.5 italic">Value</div>
-                            <div className="text-xl sm:text-2xl font-black text-white tracking-tighter">${order.amount.toFixed(2)}</div>
+                            <div className="text-xl sm:text-2xl font-black text-white tracking-tighter">{getCurrencySymbol(order.currency)}{order.amount.toFixed(2)}</div>
                           </div>
                           
                           {order.status === 'paid' && order.productId ? (

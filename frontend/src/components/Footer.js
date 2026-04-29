@@ -74,7 +74,7 @@ export default function Footer() {
         <div className="mt-20 border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
           <p className="text-xs text-slate-500 text-center md:text-left">&copy; {currentYear} DigitalMarket Global. All rights reserved.</p>
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-            <span className="text-[10px] font-bold text-slate-600 tracking-widest uppercase text-center">Product Pricing Range: $300 - $1000 USD</span>
+            <span className="text-[10px] font-bold text-slate-600 tracking-widest uppercase text-center">Product Pricing Range: ₹25,000 - ₹84,000 INR / $300 - $1000 USD</span>
             <div className="hidden md:block h-4 w-px bg-white/5"></div>
             <span className="text-[10px] font-bold text-slate-600 tracking-widest uppercase text-center">Secured by Stripe & Razorpay</span>
           </div>

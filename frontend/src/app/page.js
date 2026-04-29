@@ -178,15 +178,15 @@ export default function Home() {
             <h2 className="text-indigo-400 font-black uppercase tracking-[0.3em] text-[10px] sm:text-sm mb-4">Market Value</h2>
             <h3 className="text-3xl sm:text-6xl font-black text-white tracking-tighter uppercase italic">PRICING TIERS.</h3>
             <p className="mt-4 text-slate-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-              Premium digital assets starting from $300. Every product is hand-reviewed for maximum quality and security.
+              Premium digital assets starting from ₹25,000 or $300. Every product is hand-reviewed for maximum quality and security.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { tier: "Standard", price: "$300+", desc: "Quality-vetted essential assets." },
-              { tier: "Pro", price: "$500+", desc: "Professional grade digital solutions." },
-              { tier: "Elite", price: "$800+", desc: "Full-scale enterprise applications." }
+              { tier: "Standard", price: "₹25k+ / $300+", desc: "Quality-vetted essential assets." },
+              { tier: "Pro", price: "₹42k+ / $500+", desc: "Professional grade digital solutions." },
+              { tier: "Elite", price: "₹67k+ / $800+", desc: "Full-scale enterprise applications." }
             ].map((p, i) => (
               <div key={i} className="glass p-8 rounded-[32px] border border-white/5 text-center group hover:border-indigo-500/50 transition-all duration-500">
                 <div className="text-indigo-500 font-black text-xs uppercase tracking-[0.2em] mb-4">{p.tier}</div>

@@ -31,7 +31,7 @@ export default function PricingPage() {
           {[
             {
               title: "Standard Assets",
-              range: "$300 - $500",
+              range: "₹25,000 - ₹42,000 / $300 - $500",
               desc: "Perfect for independent creators and small projects.",
               features: ["Verified Quality", "Standard License", "Community Support", "Instant Delivery"],
               icon: <Package className="h-6 w-6 text-blue-400" />,
@@ -39,7 +39,7 @@ export default function PricingPage() {
             },
             {
               title: "Premium Assets",
-              range: "$500 - $800",
+              range: "₹42,000 - ₹67,000 / $500 - $800",
               desc: "High-performance code and exclusive designs for professionals.",
               features: ["Priority Review", "Commercial License", "Email Support", "Lifetime Updates"],
               icon: <Star className="h-6 w-6 text-indigo-400" />,
@@ -48,7 +48,7 @@ export default function PricingPage() {
             },
             {
               title: "Enterprise Solutions",
-              range: "$800 - $1000",
+              range: "₹67,000 - ₹84,000 / $800 - $1000",
               desc: "Full-scale applications and advanced architecture for businesses.",
               features: ["VIP Review", "Extended License", "Direct Support", "Source Code Access"],
               icon: <Zap className="h-6 w-6 text-purple-400" />,
@@ -124,8 +124,7 @@ export default function PricingPage() {
             <DollarSign className="h-8 w-8 text-indigo-500" />
           </div>
           <h3 className="text-2xl font-black text-white mb-4 uppercase italic">Secure Transactions</h3>
-          <p className="text-slate-400 leading-relaxed">
-            All prices are in USD. We use Razorpay and Stripe to ensure your payments are 100% secure. 
+            Prices are displayed in your local currency (INR/USD). We use Razorpay and Stripe to ensure your payments are 100% secure. 
             Our digital delivery system guarantees instant access to your assets upon successful payment.
           </p>
         </div>
