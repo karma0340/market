@@ -38,14 +38,6 @@ const userSchema = new mongoose.Schema({
   cryptoWallet: {
     address: { type: String, default: null },
     currency: { type: String, default: 'usdttrc20' } // USDT on TRC20 network by default
-  },
-  lastIp: {
-    type: String,
-    default: null
-  },
-  lastDevice: {
-    type: String,
-    default: null
   }
 }, {
   timestamps: true

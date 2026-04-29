@@ -12,13 +12,11 @@ export default function AdminDashboard() {
   const [allProducts, setAllProducts] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPayout, setSelectedPayout] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
  
   useEffect(() => {
     setMounted(true);
@@ -48,16 +46,14 @@ export default function AdminDashboard() {
   const fetchData = async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
-      const [productsRes, withdrawalsRes, ordersRes, usersRes] = await Promise.all([
+      const [productsRes, withdrawalsRes, ordersRes] = await Promise.all([
         api.get('/admin/products'),
         api.get('/admin/withdrawals'),
-        api.get('/admin/orders'),
-        api.get('/admin/users')
+        api.get('/admin/orders')
       ]);
       setAllProducts(productsRes.data);
       setWithdrawals(withdrawalsRes.data);
       setAllOrders(ordersRes.data);
-      setAllUsers(usersRes.data);
     } catch (error) {
       if (!silent) toast.error('Failed to load administrative data');
     } finally {
@@ -180,18 +176,7 @@ export default function AdminDashboard() {
             <div className="text-[9px] sm:text-xs text-purple-400 font-bold">Ready for Settlement</div>
           </div>
 
-          <div className="glass p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] border border-white/5 relative overflow-hidden group">
-            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <UserCheck className="h-24 w-24 sm:h-32 sm:w-32 text-white" />
-            </div>
-            <div className="text-[9px] sm:text-sm font-black text-slate-500 uppercase tracking-[0.2em] mb-2 sm:mb-4 flex items-center gap-2">
-              <UserCheck className="h-3 w-3 sm:h-4 sm:w-4" /> Global Registry
-            </div>
-            <div className="text-3xl sm:text-5xl font-black text-white mb-1 sm:mb-2">{allUsers.length}</div>
-            <div className="text-[9px] sm:text-xs text-purple-400 font-bold">Active Digital Citizens</div>
-          </div>
-
-          <div className="glass p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] bg-indigo-600/10 border border-indigo-500/20 flex flex-col justify-center sm:col-span-2 lg:col-span-2">
+          <div className="glass p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] bg-indigo-600/10 border border-indigo-500/20 flex flex-col justify-center sm:col-span-2 lg:col-span-1">
             <h3 className="text-base sm:text-xl font-bold text-white mb-1 sm:mb-2">Platform Health</h3>
             <div className="h-1.5 sm:h-2 w-full bg-slate-900 rounded-full overflow-hidden">
               <div className="h-full bg-indigo-500 w-[94%] shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
@@ -202,26 +187,18 @@ export default function AdminDashboard() {
 
         {/* Tactical Control Tabs */}
         <div className="glass rounded-[28px] sm:rounded-[40px] border border-white/5 overflow-hidden shadow-2xl shadow-black/50">
-          <div className="flex bg-white/[0.02] border-b border-white/5 overflow-x-auto no-scrollbar">
+          <div className="flex bg-white/[0.02] border-b border-white/5">
             <button 
               onClick={() => setActiveTab('products')}
-              className={`flex-1 min-w-[120px] py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
+              className={`flex-1 py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
                 activeTab === 'products' ? 'text-white bg-indigo-600/20 border-b-2 border-indigo-500' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
               <Package className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Assets
             </button>
             <button 
-              onClick={() => setActiveTab('users')}
-              className={`flex-1 min-w-[120px] py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
-                activeTab === 'users' ? 'text-white bg-blue-600/20 border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-300'
-              }`}
-            >
-              <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Registry
-            </button>
-            <button 
               onClick={() => setActiveTab('payouts')}
-              className={`flex-1 min-w-[120px] py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
+              className={`flex-1 py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
                 activeTab === 'payouts' ? 'text-white bg-purple-600/20 border-b-2 border-purple-500' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -229,80 +206,15 @@ export default function AdminDashboard() {
             </button>
             <button 
               onClick={() => setActiveTab('transactions')}
-              className={`flex-1 min-w-[120px] py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
+              className={`flex-1 py-4 sm:py-8 text-[9px] sm:text-xs font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 sm:gap-3 ${
                 activeTab === 'transactions' ? 'text-white bg-green-600/20 border-b-2 border-green-500' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
-              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Sales
+              <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Transactions
             </button>
           </div>
 
           <div className="p-4 sm:p-8 lg:p-12">
-            {activeTab === 'users' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-                  <h3 className="text-xl font-black text-white tracking-tight uppercase">User Registry</h3>
-                  <div className="relative w-full sm:w-72">
-                    <input 
-                      type="text" 
-                      placeholder="Search by name or email..." 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-3 text-sm text-white focus:outline-none focus:border-indigo-500/50 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4">
-                  {allUsers
-                    .filter(u => 
-                      u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                      u.email.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((registryUser) => (
-                    <div key={registryUser._id} className="glass p-6 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all">
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 font-black text-xl">
-                            {registryUser.name.charAt(0)}
-                          </div>
-                          <div>
-                            <div className="font-bold text-white flex items-center gap-2">
-                              {registryUser.name}
-                              <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
-                                registryUser.role === 'admin' ? 'bg-red-500/10 text-red-400' :
-                                registryUser.role === 'broker' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-500/10 text-slate-400'
-                              }`}>
-                                {registryUser.role}
-                              </span>
-                            </div>
-                            <div className="text-xs text-slate-500">{registryUser.email}</div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 flex-1 lg:max-w-xl">
-                          <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                            <div className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Network Identity</div>
-                            <div className="text-[10px] font-mono text-blue-400 truncate select-all">{registryUser.lastIp || 'No session data'}</div>
-                          </div>
-                          <div className="bg-white/5 p-3 rounded-2xl border border-white/5">
-                            <div className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Device Signature</div>
-                            <div className="text-[10px] font-mono text-slate-400 truncate select-all" title={registryUser.lastDevice}>
-                              {registryUser.lastDevice || 'Unknown device'}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <div className="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-1">Joined</div>
-                          <div className="text-[10px] text-white font-bold">{new Date(registryUser.createdAt).toLocaleDateString()}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             {activeTab === 'products' ? (
               <div className="space-y-4 sm:space-y-8">
                 {allProducts.length === 0 ? (

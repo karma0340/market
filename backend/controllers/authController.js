@@ -36,9 +36,7 @@ const registerUser = async (req, res, next) => {
       name,
       email,
       password,
-      role: role || 'user',
-      lastIp: req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress,
-      lastDevice: req.headers['user-agent']
+      role: role || 'user'
     });
 
     if (user) {
@@ -71,11 +69,6 @@ const loginUser = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (user && (await user.matchPassword(password))) {
-      // Update tracking info
-      user.lastIp = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-      user.lastDevice = req.headers['user-agent'];
-      await user.save();
-
       res.json({
         _id: user._id,
         name: user.name,
