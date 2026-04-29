@@ -20,7 +20,11 @@ export const useCartStore = create(
 
       getCartTotal: () => {
         const state = useCartStore.getState();
-        return state.items.reduce((total, item) => total + item.product.price, 0);
+        return state.items.reduce((acc, item) => {
+          const currency = item.product.currency || 'USD';
+          acc[currency] = (acc[currency] || 0) + item.product.price;
+          return acc;
+        }, {});
       }
     }),
     {

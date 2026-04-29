@@ -193,18 +193,35 @@ export default function CartPage() {
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-6 sm:mb-8">Order Summary</h2>
               
               <div className="space-y-6">
-                <div className="flex items-center justify-between text-sm text-slate-400">
-                  <span>Subtotal</span>
-                  <span className="font-bold text-white">${total.toFixed(2)}</span>
+                <div className="flex flex-col gap-2">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subtotal Breakdown</span>
+                  {Object.entries(total).map(([curr, amount]) => (
+                    <div key={curr} className="flex items-center justify-between text-sm text-slate-400">
+                      <span>{curr} Total</span>
+                      <span className="font-bold text-white">
+                        {curr === 'INR' ? '₹' : '$'}{amount.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
+
                 <div className="flex items-center justify-between text-sm text-slate-400">
                   <span>Processing Fee</span>
                   <span className="font-bold text-white text-xs uppercase tracking-widest text-green-500">Waived</span>
                 </div>
                 
-                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                  <span className="text-lg font-bold text-white">Total</span>
-                  <span className="text-4xl font-black text-indigo-400 tracking-tighter">${total.toFixed(2)}</span>
+                <div className="pt-6 border-t border-white/5 space-y-4">
+                  <span className="text-lg font-bold text-white block mb-2">Total to Pay</span>
+                  <div className="space-y-2">
+                    {Object.entries(total).map(([curr, amount]) => (
+                      <div key={curr} className="flex items-center justify-between">
+                        <span className="text-xs text-slate-500 uppercase font-black tracking-widest">{curr}</span>
+                        <span className={`font-black tracking-tighter ${curr === 'INR' ? 'text-blue-400 text-3xl' : 'text-indigo-400 text-4xl'}`}>
+                          {curr === 'INR' ? '₹' : '$'}{amount.toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
