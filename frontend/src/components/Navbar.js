@@ -6,7 +6,7 @@ import { useCartStore } from '@/store/useCartStore';
 import { 
   ShoppingCart, User, LogOut, Package, Menu, X, 
   Sparkles, ChevronDown, BookOpen, LayoutGrid, 
-  PlusCircle, Wallet, Settings, ShieldCheck, DollarSign
+  PlusCircle, Wallet, Settings, ShieldCheck, DollarSign, Mail
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
