@@ -41,6 +41,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending',
+  },
+  currency: {
+    type: String,
+    enum: ['USD', 'INR'],
+    default: 'USD',
   }
 }, {
   timestamps: true

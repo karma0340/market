@@ -24,6 +24,7 @@ export default function ProductUploadPage() {
     category: 'templates',
     demoUrl: '',
     imageUrl: '',
+    currency: 'USD',
   });
   const [file, setFile] = useState(null);
   const [isPasting, setIsPasting] = useState(false);
@@ -77,6 +78,7 @@ export default function ProductUploadPage() {
       data.append('price', formData.price);
       data.append('category', formData.category);
       data.append('demoUrl', formData.demoUrl);
+      data.append('currency', formData.currency);
       data.append('images', JSON.stringify([formData.imageUrl]));
       data.append('productFile', file);
 
@@ -170,6 +172,21 @@ export default function ProductUploadPage() {
                       placeholder="49"
                       className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Currency</label>
+                  <div className="relative">
+                    <Globe className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <select
+                      value={formData.currency}
+                      onChange={(e) => setFormData({...formData, currency: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-[10px] outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none font-black tracking-widest uppercase"
+                    >
+                      <option value="USD">USD ($)</option>
+                      <option value="INR">INR (₹)</option>
+                    </select>
                   </div>
                 </div>
                 

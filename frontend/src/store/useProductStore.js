@@ -40,5 +40,23 @@ export const useProductStore = create((set) => ({
       });
       throw error;
     }
+  },
+  
+  updateProduct: async (id, productData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.put(`/products/${id}`, productData);
+      set({ 
+        products: (get) => get.products.map(p => p._id === id ? res.data : p),
+        isLoading: false 
+      });
+      return res.data;
+    } catch (error) {
+      set({ 
+        error: error.response?.data?.message || 'Failed to update product', 
+        isLoading: false 
+      });
+      throw error;
+    }
   }
 }));

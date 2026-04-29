@@ -99,7 +99,9 @@ export default function ProductDetailPage() {
                 <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> Certified Premium
               </div>
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tighter mb-2 sm:mb-3 leading-tight">{product.title}</h1>
-              <p className="text-3xl sm:text-4xl font-black text-indigo-400 tracking-tighter">${product.price}</p>
+              <p className="text-3xl sm:text-4xl font-black text-indigo-400 tracking-tighter">
+                {product.currency === 'INR' ? '₹' : '$'}{product.price}
+              </p>
             </header>
             
             <div className="space-y-6 sm:space-y-8">

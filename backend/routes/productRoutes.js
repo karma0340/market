@@ -4,7 +4,8 @@ const {
   createProduct, 
   getProducts, 
   getProductById, 
-  downloadProductFile 
+  downloadProductFile,
+  updateProduct
 } = require('../controllers/productController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 const upload = require('../middlewares/uploadMiddleware');
@@ -14,7 +15,8 @@ router.route('/')
   .post(protect, authorize('broker'), upload.single('productFile'), createProduct);
 
 router.route('/:id')
-  .get(getProductById);
+  .get(getProductById)
+  .put(protect, authorize('broker'), updateProduct);
 
 router.get('/:id/download', protect, downloadProductFile);
 

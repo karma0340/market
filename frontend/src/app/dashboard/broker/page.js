@@ -9,7 +9,7 @@ import {
   CheckCircle, AlertCircle, TrendingUp, 
   Package, ExternalLink, ChevronRight, 
   DollarSign, ShieldCheck, Zap, BarChart3,
-  ArrowUpRight, LayoutGrid
+  ArrowUpRight, LayoutGrid, Edit3, X, Save
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,10 @@ export default function BrokerDashboard() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [payoutBreakdown, setPayoutBreakdown] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const getCurrencySymbol = (currency) => currency === 'INR' ? '₹' : '$';
 
   useEffect(() => {
     setMounted(true);
@@ -126,6 +130,21 @@ export default function BrokerDashboard() {
       fetchTransactions();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Withdrawal failed');
+    }
+  };
+
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    try {
+      await api.put(`/products/${editingProduct._id}`, editingProduct);
+      toast.success('Product updated successfully');
+      setEditingProduct(null);
+      fetchMyProducts();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Update failed');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -279,7 +298,9 @@ export default function BrokerDashboard() {
                           <div>
                             <h4 className="font-black text-white text-lg tracking-tight group-hover:text-indigo-400 transition-colors">{p.title}</h4>
                             <div className="flex items-center gap-3 mt-2">
-                              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">${p.price}</span>
+                              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">
+                                {getCurrencySymbol(p.currency)}{p.price}
+                              </span>
                               <span className="h-1 w-1 rounded-full bg-slate-700"></span>
                               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{p.category}</span>
                             </div>
@@ -293,9 +314,12 @@ export default function BrokerDashboard() {
                           }`}>
                             {p.status}
                           </span>
-                          <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white group-hover:text-slate-950 transition-all">
-                            <ChevronRight className="h-5 w-5" />
-                          </div>
+                          <button 
+                            onClick={() => setEditingProduct(p)}
+                            className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all"
+                          >
+                            <Edit3 className="h-4 w-4" />
+                          </button>
                         </div>
                       </motion.div>
                     ))}
@@ -453,6 +477,107 @@ export default function BrokerDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Edit Product Modal */}
+      <AnimatePresence>
+        {editingProduct && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEditingProduct(null)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl"
+            ></motion.div>
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl glass rounded-[40px] border border-white/10 overflow-hidden shadow-2xl"
+            >
+              <div className="p-8 sm:p-12">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-black text-white tracking-tighter uppercase tracking-widest text-xs text-indigo-400">
+                    Modify <span className="text-white">Asset.</span>
+                  </h2>
+                  <button onClick={() => setEditingProduct(null)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                    <X className="h-6 w-6 text-slate-500" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleUpdateProduct} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Asset Title</label>
+                      <input
+                        type="text"
+                        value={editingProduct.title}
+                        onChange={(e) => setEditingProduct({...editingProduct, title: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Listed Amount</label>
+                      <input
+                        type="number"
+                        value={editingProduct.price}
+                        onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Currency</label>
+                      <select
+                        value={editingProduct.currency || 'USD'}
+                        onChange={(e) => setEditingProduct({...editingProduct, currency: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                      >
+                        <option value="USD">USD ($)</option>
+                        <option value="INR">INR (₹)</option>
+                      </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Category Cluster</label>
+                      <select
+                        value={editingProduct.category}
+                        onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                      >
+                        <option value="templates">Templates</option>
+                        <option value="courses">Courses</option>
+                        <option value="software">Software</option>
+                        <option value="assets">Assets</option>
+                      </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Asset Description</label>
+                      <textarea
+                        rows="4"
+                        value={editingProduct.description}
+                        onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="w-full bg-white text-slate-950 font-black py-5 rounded-3xl uppercase tracking-[0.2em] text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-2xl flex items-center justify-center gap-3"
+                  >
+                    {isUpdating ? 'Syncing...' : <><Save className="h-4 w-4" /> Deploy Changes</>}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

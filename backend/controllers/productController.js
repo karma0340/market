@@ -8,7 +8,7 @@ const fs = require('fs');
 // @access  Private/Broker
 const createProduct = async (req, res, next) => {
   try {
-    const { title, description, price, images, category, demoUrl } = req.body;
+    const { title, description, price, currency, images, category, demoUrl } = req.body;
     
     if (!req.file) {
       res.status(400);
@@ -37,6 +37,7 @@ const createProduct = async (req, res, next) => {
       filePath,
       category,
       demoUrl,
+      currency: currency || 'USD',
       sellerId: req.user._id,
       status: 'approved' // Automatically approve for now to make it easier for the user
     });
@@ -132,9 +133,64 @@ const downloadProductFile = async (req, res, next) => {
   }
 };
 
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Broker
+const updateProduct = async (req, res, next) => {
+  try {
+    let product = await Product.findById(req.params.id);
+
+    if (!product) {
+      res.status(404);
+      return next(new Error('Product not found'));
+    }
+
+    // Make sure user is product owner
+    if (product.sellerId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      res.status(401);
+      return next(new Error('User not authorized to update this product'));
+    }
+
+    const { title, description, price, currency, images, category, demoUrl } = req.body;
+
+    // Handle images if provided as JSON string
+    let parsedImages = images;
+    if (images && typeof images === 'string') {
+      try {
+        parsedImages = JSON.parse(images);
+      } catch (e) {
+        parsedImages = [images];
+      }
+    }
+
+    const updateData = {
+      title: title || product.title,
+      description: description || product.description,
+      price: price ? Number(price) : product.price,
+      currency: currency || product.currency,
+      category: category || product.category,
+      demoUrl: demoUrl !== undefined ? demoUrl : product.demoUrl,
+    };
+
+    if (parsedImages) {
+      updateData.images = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
+    }
+
+    product = await Product.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createProduct,
   getProducts,
   getProductById,
-  downloadProductFile
+  downloadProductFile,
+  updateProduct
 };

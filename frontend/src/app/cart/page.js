@@ -178,7 +178,9 @@ export default function CartPage() {
                       <div className="flex items-center gap-2 text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest italic">
                         Digital License
                       </div>
-                      <p className="text-xl sm:text-3xl font-black text-white tracking-tighter">${item.product.price}</p>
+                      <p className="text-xl sm:text-3xl font-black text-white tracking-tighter">
+                        {item.product.currency === 'INR' ? '₹' : '$'}{item.product.price}
+                      </p>
                     </div>
                   </div>
                 </li>

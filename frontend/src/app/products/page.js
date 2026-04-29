@@ -143,7 +143,9 @@ export default function ProductsPage() {
                     </div>
 
                     <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-slate-950/80 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border border-white/10">
-                      <p className="text-base sm:text-lg font-black text-white tracking-tighter">${product.price}</p>
+                      <p className="text-base sm:text-lg font-black text-white tracking-tighter">
+                        {product.currency === 'INR' ? '₹' : '$'}{product.price}
+                      </p>
                     </div>
                   </div>
                   
