@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
 import { 
-  ShoppingCart, User, LogOut, Package, Menu, X, 
+  ShoppingCart, LogOut, Package, Menu, X, 
   Sparkles, ChevronDown, BookOpen, LayoutGrid, 
-  PlusCircle, Wallet, Settings, ShieldCheck, DollarSign, Mail
+  PlusCircle, Wallet, ShieldCheck, DollarSign, Mail
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
