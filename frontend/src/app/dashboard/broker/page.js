@@ -9,7 +9,7 @@ import {
   CheckCircle, AlertCircle, TrendingUp, 
   Package, ExternalLink, ChevronRight, 
   DollarSign, ShieldCheck, Zap, BarChart3,
-  ArrowUpRight, LayoutGrid, Edit3, X, Save
+  ArrowUpRight, LayoutGrid, Edit3, X, Save, Upload
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';

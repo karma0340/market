@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
-import { ShieldCheck, Package, DollarSign, UserCheck, AlertCircle, Check, X, RefreshCw, Layers, TrendingUp, Trash2 } from 'lucide-react';
+import { ShieldCheck, Package, DollarSign, UserCheck, AlertCircle, Check, X, RefreshCw, Layers, TrendingUp, Trash2, FileText } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -89,6 +89,26 @@ export default function AdminDashboard() {
       fetchData();
     } catch (error) {
       toast.error('Failed to process withdrawal');
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId) => {
+    try {
+      toast.loading('Generating invoice...', { id: 'invoice-gen' });
+      const response = await api.get(`/admin/orders/${orderId}/invoice`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice_${orderId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('Invoice downloaded', { id: 'invoice-gen' });
+    } catch (error) {
+      toast.error('Failed to generate invoice', { id: 'invoice-gen' });
     }
   };
 
@@ -355,6 +375,15 @@ export default function AdminDashboard() {
                       }`}>
                         {order.status}
                       </span>
+                    </div>
+                    <div className="flex justify-end">
+                      <button 
+                        onClick={() => handleDownloadInvoice(order._id)}
+                        className="p-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl transition-all group/btn"
+                        title="Download Invoice"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 ))}

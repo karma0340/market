@@ -8,7 +8,8 @@ const {
   getWithdrawalRequests, 
   approveWithdrawal,
   getUsers,
-  getAllOrders 
+  getAllOrders,
+  generateInvoice
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middlewares/authMiddleware');
 
@@ -23,6 +24,7 @@ router.get('/withdrawals', getWithdrawalRequests);
 router.put('/withdrawals/:id/approve', approveWithdrawal);
 
 router.get('/orders', getAllOrders);
+router.get('/orders/:id/invoice', generateInvoice);
 
 router.get('/users', getUsers);
 

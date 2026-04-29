@@ -3,6 +3,7 @@ const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const { executeCryptoPayout } = require('../services/nowpaymentsService');
+const PDFDocument = require('pdfkit');
 
 // @desc    Get all pending products
 // @route   GET /api/admin/products/pending
@@ -157,6 +158,77 @@ const getAllOrders = async (req, res, next) => {
   }
 };
 
+// @desc    Generate PDF Invoice for an order
+// @route   GET /api/admin/orders/:id/invoice
+// @access  Private/Admin
+const generateInvoice = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('userId', 'name email')
+      .populate('productId', 'title description price currency');
+
+    if (!order) {
+      res.status(404);
+      return next(new Error('Order not found'));
+    }
+
+    const doc = new PDFDocument({ margin: 50 });
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice_${order._id}.pdf`);
+
+    doc.pipe(res);
+
+    // --- Header ---
+    doc.fillColor('#444444').fontSize(20).text('DigitalMarket', 50, 50);
+    doc.fontSize(10).text('Elite Digital Asset Marketplace', 50, 75);
+    doc.fontSize(10).text('invoice@digitalmarket.app', 50, 90);
+
+    doc.fontSize(20).text('INVOICE', 200, 50, { align: 'right' });
+    doc.fontSize(10).text(`Invoice #: INV-${order._id.toString().slice(-6).toUpperCase()}`, 200, 75, { align: 'right' });
+    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 200, 90, { align: 'right' });
+    doc.text(`Status: ${order.status.toUpperCase()}`, 200, 105, { align: 'right' });
+
+    doc.moveTo(50, 130).lineTo(550, 130).stroke();
+
+    // --- Bill To ---
+    doc.fontSize(12).fillColor('#333333').text('BILL TO:', 50, 150);
+    doc.fontSize(10).fillColor('#000000').text(order.userId.name, 50, 170);
+    doc.text(order.userId.email, 50, 185);
+
+    // --- Table Header ---
+    const tableTop = 230;
+    doc.fillColor('#F0F0F0').rect(50, tableTop, 500, 20).fill();
+    doc.fillColor('#333333').fontSize(10).text('Description', 60, tableTop + 5);
+    doc.text('Quantity', 350, tableTop + 5, { width: 50, align: 'center' });
+    doc.text('Price', 400, tableTop + 5, { width: 150, align: 'right' });
+
+    // --- Table Row ---
+    doc.fillColor('#000000').text(order.productId.title, 60, tableTop + 30);
+    doc.text('1', 350, tableTop + 30, { width: 50, align: 'center' });
+    const currency = order.currency === 'INR' ? 'INR' : 'USD';
+    const symbol = currency === 'INR' ? 'Rs.' : '$';
+    doc.text(`${symbol} ${order.amount}`, 400, tableTop + 30, { width: 150, align: 'right' });
+
+    doc.moveTo(50, tableTop + 50).lineTo(550, tableTop + 50).stroke();
+
+    // --- Total ---
+    doc.fontSize(12).font('Helvetica-Bold').text('TOTAL:', 350, tableTop + 70);
+    doc.fontSize(14).text(`${symbol} ${order.amount}`, 400, tableTop + 70, { width: 150, align: 'right' });
+
+    // --- Footer ---
+    doc.fontSize(10).font('Helvetica').fillColor('#888888').text(
+      'Thank you for your business. All digital asset sales are final.',
+      50, 700, { align: 'center', width: 500 }
+    );
+
+    doc.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getPendingProducts,
   getAllProducts,
@@ -165,5 +237,6 @@ module.exports = {
   getWithdrawalRequests,
   approveWithdrawal,
   getUsers,
-  getAllOrders
+  getAllOrders,
+  generateInvoice
 };
