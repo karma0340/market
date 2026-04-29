@@ -176,6 +176,17 @@ const updateProduct = async (req, res, next) => {
       updateData.images = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
     }
 
+    // Handle File Update
+    if (req.file) {
+      // Delete old file if it exists
+      if (product.filePath && fs.existsSync(product.filePath)) {
+        fs.unlink(product.filePath, (err) => {
+          if (err) console.error('Failed to delete old file during update', err);
+        });
+      }
+      updateData.filePath = req.file.path;
+    }
+
     product = await Product.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,

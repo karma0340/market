@@ -16,7 +16,7 @@ router.route('/')
 
 router.route('/:id')
   .get(getProductById)
-  .put(protect, authorize('broker'), updateProduct);
+  .put(protect, authorize('broker'), upload.single('productFile'), updateProduct);
 
 router.get('/:id/download', protect, downloadProductFile);
 

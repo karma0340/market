@@ -32,6 +32,7 @@ export default function BrokerDashboard() {
   const [payoutBreakdown, setPayoutBreakdown] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [newFile, setNewFile] = useState(null);
 
   const getCurrencySymbol = (currency) => currency === 'INR' ? '₹' : '$';
 
@@ -137,9 +138,22 @@ export default function BrokerDashboard() {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      await api.put(`/products/${editingProduct._id}`, editingProduct);
+      const data = new FormData();
+      data.append('title', editingProduct.title);
+      data.append('description', editingProduct.description);
+      data.append('price', editingProduct.price);
+      data.append('currency', editingProduct.currency);
+      data.append('category', editingProduct.category);
+      if (editingProduct.demoUrl) data.append('demoUrl', editingProduct.demoUrl);
+      if (newFile) data.append('productFile', newFile);
+
+      await api.put(`/products/${editingProduct._id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
       toast.success('Product updated successfully');
       setEditingProduct(null);
+      setNewFile(null);
       fetchMyProducts();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Update failed');
@@ -562,6 +576,23 @@ export default function BrokerDashboard() {
                         onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
                         className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
                       ></textarea>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 ml-1">Update Asset File (ZIP/PDF)</label>
+                      <div className="relative group">
+                        <input
+                          type="file"
+                          onChange={(e) => setNewFile(e.target.files[0])}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="w-full bg-white/5 border border-dashed border-white/10 rounded-2xl px-6 py-4 flex items-center justify-center gap-3 group-hover:border-indigo-500/50 transition-all">
+                          <Upload className="h-4 w-4 text-indigo-400" />
+                          <span className="text-[10px] font-black text-white uppercase tracking-widest truncate">
+                            {newFile ? newFile.name : 'Select new version (Optional)'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
