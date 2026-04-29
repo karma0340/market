@@ -61,7 +61,8 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-8">
               <Link href="/products" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Marketplace</Link>
               <Link href="/pricing" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Pricing</Link>
-              <Link href="/about" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Company</Link>
+              <Link href="/about" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">About Us</Link>
+              <Link href="/contact" className="text-sm font-bold text-slate-400 hover:text-white transition-colors">Contact</Link>
             </div>
           </div>
 
@@ -240,7 +241,10 @@ export default function Navbar() {
                   <DollarSign className="h-5 w-5 text-green-400" /> Pricing
                 </Link>
                 <Link href="/about" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-sm font-black text-slate-300 uppercase tracking-widest hover:text-white">
-                  <Sparkles className="h-5 w-5 text-purple-400" /> Company
+                  <Sparkles className="h-5 w-5 text-purple-400" /> About Us
+                </Link>
+                <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-4 text-sm font-black text-slate-300 uppercase tracking-widest hover:text-white">
+                  <Mail className="h-5 w-5 text-indigo-400" /> Contact
                 </Link>
               </div>
               

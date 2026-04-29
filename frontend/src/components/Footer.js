@@ -52,7 +52,9 @@ export default function Footer() {
                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">Legal</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li><Link href="/privacy" className="text-sm text-slate-400 hover:text-white transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="/terms" className="text-sm text-slate-400 hover:text-white transition-colors">User Terms</Link></li>
+                  <li><Link href="/terms" className="text-sm text-slate-400 hover:text-white transition-colors">Terms & Conditions</Link></li>
+                  <li><Link href="/refunds" className="text-sm text-slate-400 hover:text-white transition-colors">Refund Policy</Link></li>
+                  <li><Link href="/shipping" className="text-sm text-slate-400 hover:text-white transition-colors">Shipping & Delivery</Link></li>
                 </ul>
               </div>
               <div className="mt-12 md:mt-0">
@@ -71,7 +73,9 @@ export default function Footer() {
         
         <div className="mt-20 border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">&copy; {currentYear} DigitalMarket Global. All rights reserved.</p>
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-8 text-right">
+            <span className="text-[10px] font-bold text-slate-600 tracking-widest uppercase">Product Pricing Range: $300 - $1000 USD</span>
+            <div className="h-4 w-px bg-white/5"></div>
             <span className="text-[10px] font-bold text-slate-600 tracking-widest uppercase">Secured by Stripe & Razorpay</span>
           </div>
         </div>

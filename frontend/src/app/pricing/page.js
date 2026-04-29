@@ -13,16 +13,16 @@ export default function PricingPage() {
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center mb-16">
-          <h2 className="text-indigo-400 font-black uppercase tracking-[0.3em] text-sm mb-4">Pricing Strategy</h2>
+          <h2 className="text-indigo-400 font-black uppercase tracking-[0.3em] text-sm mb-4">Pricing Policy</h2>
           <p className="text-4xl font-black tracking-tight text-white sm:text-6xl mb-6">
             PREMIUM ASSETS. <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              FAIR MARKET VALUE.
+              TRANSPARENT VALUE.
             </span>
           </p>
           <p className="text-lg leading-8 text-slate-400">
             Our marketplace hosts high-end digital assets curated for professional creators and enterprises. 
-            Quality is our priority, ensuring every purchase delivers exceptional value.
+            All prices are fixed and represent the quality-vetted value of each asset.
           </p>
         </div>
 
@@ -91,6 +91,30 @@ export default function PricingPage() {
               </Link>
             </div>
           ))}
+        </div>
+
+        {/* Detailed Policies for Compliance */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+          <div className="glass p-10 rounded-[40px] border border-white/5">
+            <h3 className="text-xl font-black text-white mb-4 uppercase tracking-tighter flex items-center gap-3">
+              <Shield className="h-6 w-6 text-indigo-500" /> Refund & Cancellation
+            </h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Due to the nature of digital assets, we generally do not offer refunds once the asset has been accessed or downloaded. 
+              However, if an asset is proven to be defective or incorrectly described, you may request a refund within 24 hours of purchase. 
+              Cancellations are not possible once the transaction is completed.
+            </p>
+          </div>
+          <div className="glass p-10 rounded-[40px] border border-white/5">
+            <h3 className="text-xl font-black text-white mb-4 uppercase tracking-tighter flex items-center gap-3">
+              <Zap className="h-6 w-6 text-purple-500" /> Shipping & Delivery
+            </h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              All products on DigitalMarket are digital assets. No physical shipping is required. 
+              Upon successful payment, assets are delivered instantly via your user dashboard. 
+              You will also receive an email with secure access instructions immediately after purchase.
+            </p>
+          </div>
         </div>
 
         {/* Security Trust Section */}
