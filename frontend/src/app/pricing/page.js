@@ -124,6 +124,7 @@ export default function PricingPage() {
             <DollarSign className="h-8 w-8 text-indigo-500" />
           </div>
           <h3 className="text-2xl font-black text-white mb-4 uppercase italic">Secure Transactions</h3>
+          <p className="text-slate-400 leading-relaxed">
             Prices are displayed in your local currency (INR/USD). We use Razorpay and Stripe to ensure your payments are 100% secure. 
             Our digital delivery system guarantees instant access to your assets upon successful payment.
           </p>
