@@ -39,7 +39,22 @@ const initiatePayment = async (req, res, next) => {
       return next(new Error(`You have already purchased: ${titles}`));
     }
 
-    const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
+    const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
+    
+    // Calculate totals in both currencies
+    let totalUSD = 0;
+    let totalINR = 0;
+
+    products.forEach(p => {
+      if (p.currency === 'INR') {
+        totalINR += p.price;
+        totalUSD += p.price / USD_TO_INR;
+      } else {
+        // Default to USD
+        totalUSD += p.price;
+        totalINR += p.price * USD_TO_INR;
+      }
+    });
 
     // Create pending orders for all products
     const orders = await Promise.all(products.map(product => 
@@ -48,6 +63,7 @@ const initiatePayment = async (req, res, next) => {
         productId: product._id,
         paymentType,
         amount: product.price,
+        currency: product.currency || 'USD',
         status: 'pending'
       })
     ));
@@ -55,20 +71,25 @@ const initiatePayment = async (req, res, next) => {
     const tempPaymentId = `TEMP_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     let paymentData = {};
 
+    console.log(`[PAYMENT] Initiating ${paymentType} for User: ${userId}. Total USD: ${totalUSD}, Total INR: ${totalINR}`);
+
     switch (paymentType) {
       case 'razorpay': {
-        const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
-        const totalInINR = Math.round(totalPrice * USD_TO_INR);
-        const totalInPaise = totalInINR * 100;
+        const roundedTotalINR = Math.round(totalINR);
+        const totalInPaise = roundedTotalINR * 100;
 
         if (totalInPaise < 100) {
           res.status(400);
           return next(new Error('Minimum amount for Razorpay is ₹1 (100 paise)'));
         }
 
-        const rzOrder = await createRazorpayOrder(totalInINR, tempPaymentId);
+        // Razorpay often has limits (e.g., ₹5,00,000). If it's too high, let's log it.
+        if (roundedTotalINR > 1000000) {
+          console.warn(`[PAYMENT] Large Razorpay amount: ₹${roundedTotalINR}`);
+        }
+
+        const rzOrder = await createRazorpayOrder(roundedTotalINR, tempPaymentId);
         
-        // Update all orders with the Razorpay order ID
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: rzOrder.id });
         
         paymentData = { pgOrderId: rzOrder.id, currency: rzOrder.currency, amount: rzOrder.amount };
@@ -76,9 +97,16 @@ const initiatePayment = async (req, res, next) => {
       }
 
       case 'stripe': {
-        const session = await createStripeCheckoutSession(products, tempPaymentId);
+        // Stripe expects amounts in cents. createStripeCheckoutSession currently assumes products have price in USD.
+        // We need to pass the normalized USD products or update the service.
+        // For now, let's pass the products but the service needs to know their USD price.
+        const normalizedProducts = products.map(p => ({
+          ...p.toObject(),
+          price: p.currency === 'INR' ? p.price / USD_TO_INR : p.price
+        }));
+
+        const session = await createStripeCheckoutSession(normalizedProducts, tempPaymentId);
         
-        // Update all orders with the Stripe Session ID
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: session.id });
         
         paymentData = { url: session.url };
@@ -86,9 +114,8 @@ const initiatePayment = async (req, res, next) => {
       }
 
       case 'crypto': {
-        const invoice = await createCryptoInvoice(totalPrice, tempPaymentId, `Bulk purchase of ${products.length} items`);
+        const invoice = await createCryptoInvoice(totalUSD, tempPaymentId, `Bulk purchase of ${products.length} items`);
         
-        // Update all orders with the NOWPayments Invoice ID
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: invoice.invoice_id });
         
         paymentData = { invoiceUrl: invoice.invoice_url };
@@ -106,7 +133,11 @@ const initiatePayment = async (req, res, next) => {
       ...paymentData
     });
   } catch (error) {
-    console.error('Payment Initiation Error:', error);
+    console.error('Payment Initiation Error Detail:', {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data
+    });
     const message = error.response?.data?.message || error.message || 'Payment engine failure';
     res.status(500).json({ message });
   }
@@ -135,11 +166,15 @@ const processSuccessfulPayment = async (paymentId, actualPGId) => {
     const platformFee = (order.amount * COMMISSION_PERCENTAGE) / 100;
     const sellerEarnings = order.amount - platformFee;
 
+    // Convert to USD if needed for the wallet balance (Assuming wallet is in USD)
+    const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
+    const sellerEarningsInUSD = order.currency === 'INR' ? sellerEarnings / USD_TO_INR : sellerEarnings;
+
     // Update Broker Wallet
     const sellerId = order.productId.sellerId;
     const seller = await User.findById(sellerId);
     if (seller) {
-      seller.wallet.pending += sellerEarnings;
+      seller.wallet.pending += sellerEarningsInUSD;
       await seller.save();
     }
 
