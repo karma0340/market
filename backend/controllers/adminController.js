@@ -5,6 +5,8 @@ const Order = require('../models/Order');
 const Notification = require('../models/Notification');
 const { executeCryptoPayout } = require('../services/nowpaymentsService');
 const PDFDocument = require('pdfkit');
+const path = require('path');
+const fs = require('fs');
 
 // ────────────────────────────────────────────────────────────────────────
 // DASHBOARD STATS
@@ -388,50 +390,87 @@ const generateInvoice = async (req, res, next) => {
       return next(new Error('Order not found'));
     }
 
-    const doc = new PDFDocument({ margin: 50 });
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice_${order._id}.pdf`);
 
     doc.pipe(res);
 
-    doc.fillColor('#444444').fontSize(20).text('DigitalMarket', 50, 50);
-    doc.fontSize(10).text('Elite Digital Asset Marketplace', 50, 75);
-    doc.fontSize(10).text('invoice@digitalmarket.app', 50, 90);
+    // Styling constants
+    const brandColor = '#0070FF'; // Main brand blue
+    const darkColor = '#111113';
+    const grayColor = '#6B7280';
+    const lightGray = '#E5E7EB';
 
-    doc.fontSize(20).text('INVOICE', 200, 50, { align: 'right' });
-    doc.fontSize(10).text(`Invoice #: INV-${order._id.toString().slice(-6).toUpperCase()}`, 200, 75, { align: 'right' });
-    doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 200, 90, { align: 'right' });
-    doc.text(`Status: ${order.status.toUpperCase()}`, 200, 105, { align: 'right' });
+    // Logo
+    const logoPath = path.join(__dirname, '../../frontend/public/icon-logo.png');
+    let titleX = 50;
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 45, { width: 40 });
+      titleX = 100;
+    }
 
-    doc.moveTo(50, 130).lineTo(550, 130).stroke();
+    // Company Header
+    doc.fillColor(darkColor)
+       .fontSize(22).font('Helvetica-Bold')
+       .text('DigitalMarket', titleX, 50);
+    
+    doc.fillColor(grayColor)
+       .fontSize(10).font('Helvetica')
+       .text('Premium Digital Assets', titleX, 75);
 
-    doc.fontSize(12).fillColor('#333333').text('BILL TO:', 50, 150);
-    doc.fontSize(10).fillColor('#000000').text(order.userId.name, 50, 170);
-    doc.text(order.userId.email, 50, 185);
+    // Invoice Meta (Right Aligned)
+    doc.fillColor(brandColor)
+       .fontSize(20).font('Helvetica-Bold')
+       .text('INVOICE', 0, 50, { align: 'right', width: 545 });
+    
+    doc.fillColor(darkColor).fontSize(10)
+       .text(`Invoice No: INV-${order._id.toString().slice(-8).toUpperCase()}`, 0, 75, { align: 'right', width: 545 })
+       .text(`Date: ${new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 0, 90, { align: 'right', width: 545 })
+       .text(`Status: ${order.status.toUpperCase()}`, 0, 105, { align: 'right', width: 545 });
 
-    const tableTop = 230;
-    doc.fillColor('#F0F0F0').rect(50, tableTop, 500, 20).fill();
-    doc.fillColor('#333333').fontSize(10).text('Description', 60, tableTop + 5);
-    doc.text('Quantity', 350, tableTop + 5, { width: 50, align: 'center' });
-    doc.text('Price', 400, tableTop + 5, { width: 150, align: 'right' });
+    doc.moveDown();
+    doc.moveTo(50, 140).lineTo(545, 140).lineWidth(1).strokeColor(lightGray).stroke();
 
-    doc.fillColor('#000000').text(order.productId.title, 60, tableTop + 30);
-    doc.text('1', 350, tableTop + 30, { width: 50, align: 'center' });
+    // Bill To Section
+    doc.fillColor(grayColor).fontSize(10).font('Helvetica-Bold').text('BILL TO:', 50, 160);
+    doc.fillColor(darkColor).fontSize(12).text(order.userId?.name || 'Guest User', 50, 175);
+    doc.fillColor(grayColor).fontSize(10).font('Helvetica').text(order.userId?.email || 'N/A', 50, 190);
+
+    // Table Header
+    const tableTop = 240;
+    doc.rect(50, tableTop, 495, 30).fillColor(brandColor).fill();
+    
+    doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(10)
+       .text('ITEM DESCRIPTION', 60, tableTop + 10)
+       .text('QTY', 380, tableTop + 10, { width: 40, align: 'center' })
+       .text('TOTAL', 430, tableTop + 10, { width: 100, align: 'right' });
+
+    // Table Row
+    const rowTop = tableTop + 45;
+    doc.fillColor(darkColor).font('Helvetica').fontSize(10)
+       .text(order.productId?.title || 'Unknown Product', 60, rowTop, { width: 300 })
+       .text('1', 380, rowTop, { width: 40, align: 'center' });
+       
     const currency = order.currency === 'INR' ? 'INR' : 'USD';
     const symbol = currency === 'INR' ? 'Rs.' : '$';
-    doc.text(`${symbol} ${order.amount}`, 400, tableTop + 30, { width: 150, align: 'right' });
+    doc.text(`${symbol}${order.amount || 0}`, 430, rowTop, { width: 100, align: 'right' });
 
-    doc.moveTo(50, tableTop + 50).lineTo(550, tableTop + 50).stroke();
+    // Bottom Line
+    doc.moveTo(50, rowTop + 30).lineTo(545, rowTop + 30).lineWidth(1).strokeColor(lightGray).stroke();
 
-    doc.fontSize(12).font('Helvetica-Bold').text('TOTAL:', 350, tableTop + 70);
-    doc.fontSize(14).text(`${symbol} ${order.amount}`, 400, tableTop + 70, { width: 150, align: 'right' });
+    // Total Section
+    const totalTop = rowTop + 50;
+    doc.fillColor(darkColor).font('Helvetica-Bold').fontSize(12)
+       .text('TOTAL PAID:', 330, totalTop, { width: 100, align: 'right' })
+       .fillColor(brandColor).fontSize(16)
+       .text(`${symbol}${order.amount || 0}`, 430, totalTop - 2, { width: 100, align: 'right' });
 
-    doc.fontSize(10).font('Helvetica').fillColor('#888888').text(
-      'Thank you for your business. All digital asset sales are final.',
-      50, 700, { align: 'center', width: 500 }
-    );
-
+    // Footer
+    doc.fillColor(grayColor).fontSize(10).font('Helvetica')
+       .text('Thank you for choosing DigitalMarket. All digital asset sales are final.', 50, 750, { align: 'center', width: 495 });
+    
     doc.end();
   } catch (error) {
     next(error);

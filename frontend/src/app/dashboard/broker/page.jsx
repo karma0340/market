@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import NotificationDropdown from '@/components/NotificationDropdown';
 import Link from 'next/link';
-import { LayoutGrid, Package, BarChart3, Settings, DollarSign, ShoppingBag, PlusCircle, Bell, ArrowUpRight, ArrowDownRight, Clock, CheckCircle, XCircle, Eye, Upload, ShieldCheck, Phone, Smartphone, Send, HeadphonesIcon, Home, LogOut, Menu, X } from 'lucide-react';
+import { LayoutGrid, Package, BarChart3, Settings, DollarSign, ShoppingBag, PlusCircle, Bell, ArrowUpRight, ArrowDownRight, Clock, CheckCircle, XCircle, Eye, Upload, ShieldCheck, Phone, Smartphone, Send, HeadphonesIcon, Home, LogOut, Menu, X, Edit } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { NeonAreaChart, NeonLineChart, GlowingProgressCircle, AssetPerformanceChart } from '@/components/NeonCharts';
@@ -615,6 +615,9 @@ export default function BrokerDashboard() {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-extrabold text-white">{p.currency === 'INR' ? '₹' : '$'}{p.price}</p>
+                  <Link href={`/dashboard/broker/edit/${p._id}`} className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E293B] text-[10px] font-bold text-white hover:bg-[#b200ff] hover:text-white transition-all uppercase tracking-wider border border-white/5">
+                    <Edit className="h-3 w-3" /> Edit Asset
+                  </Link>
                 </div>
               </div>
             ))}

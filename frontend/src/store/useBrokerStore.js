@@ -83,4 +83,16 @@ export const useBrokerStore = create((set, get) => ({
       throw error.response?.data || error;
     }
   },
+
+  updateAsset: async (id, formData) => {
+    try {
+      const res = await api.put(`/products/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      await get().fetchProducts();
+      return res.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  },
 }));
