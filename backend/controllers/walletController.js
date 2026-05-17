@@ -39,33 +39,30 @@ const getWallet = async (req, res, next) => {
       pending: user.wallet.pending,
       transactions,
       clearancePeriod: 7, // Days
-      cryptoWallet: user.cryptoWallet
+      payoutMethods: user.payoutMethods
     });
   } catch (error) {
     next(error);
   }
 };
 
-// @desc    Update broker's crypto wallet address
-// @route   PUT /api/wallet/crypto-wallet
+// @desc    Update broker's payout methods
+// @route   PUT /api/wallet/payout-methods
 // @access  Private/Broker
-const updateCryptoWallet = async (req, res, next) => {
+const updatePayoutMethods = async (req, res, next) => {
   try {
-    const { address, currency } = req.body;
-
-    if (!address || address.trim() === '') {
-      res.status(400);
-      return next(new Error('Please provide a valid crypto wallet address'));
-    }
-
+    const { crypto, gpay, upi, paypal, bankTransfer } = req.body;
     const user = await User.findById(req.user._id);
-    user.cryptoWallet = {
-      address: address.trim(),
-      currency: currency || 'usdttrc20'
-    };
+
+    if (crypto !== undefined) user.payoutMethods.crypto = crypto;
+    if (gpay !== undefined) user.payoutMethods.gpay = gpay;
+    if (upi !== undefined) user.payoutMethods.upi = upi;
+    if (paypal !== undefined) user.payoutMethods.paypal = paypal;
+    if (bankTransfer !== undefined) user.payoutMethods.bankTransfer = bankTransfer;
+
     await user.save();
 
-    res.json({ message: 'Crypto wallet updated successfully', cryptoWallet: user.cryptoWallet });
+    res.json({ message: 'Payout methods updated successfully', payoutMethods: user.payoutMethods });
   } catch (error) {
     next(error);
   }
@@ -74,9 +71,9 @@ const updateCryptoWallet = async (req, res, next) => {
 // @desc    Request payout (80% of balance)
 // @route   POST /api/wallet/withdraw
 // @access  Private/Broker
-const requestWithdrawal = async (req, res, next) => {
+  const requestWithdrawal = async (req, res, next) => {
   try {
-    const { amount } = req.body;
+    const { amount, method } = req.body; // method can be 'crypto', 'gpay', 'upi', 'paypal', 'bankTransfer'
     const user = await User.findById(req.user._id);
 
     if (amount <= 0) {
@@ -89,10 +86,28 @@ const requestWithdrawal = async (req, res, next) => {
       return next(new Error('Insufficient balance'));
     }
 
-    if (!user.cryptoWallet || !user.cryptoWallet.address) {
+    if (!method || !user.payoutMethods[method]) {
       res.status(400);
-      return next(new Error('Please add a crypto wallet address before requesting a payout'));
+      return next(new Error('Please select a valid payout method'));
     }
+    
+    // Check if the selected method is properly configured
+    let payoutDetails = '';
+    if (method === 'crypto' && !user.payoutMethods.crypto?.address) {
+      return next(new Error('Crypto wallet is not configured'));
+    } else if (method === 'crypto') payoutDetails = `${user.payoutMethods.crypto.address} (${user.payoutMethods.crypto.currency})`;
+    
+    if (method === 'gpay' && !user.payoutMethods.gpay) return next(new Error('GPay is not configured'));
+    else if (method === 'gpay') payoutDetails = user.payoutMethods.gpay;
+    
+    if (method === 'upi' && !user.payoutMethods.upi) return next(new Error('UPI is not configured'));
+    else if (method === 'upi') payoutDetails = user.payoutMethods.upi;
+    
+    if (method === 'paypal' && !user.payoutMethods.paypal) return next(new Error('PayPal is not configured'));
+    else if (method === 'paypal') payoutDetails = user.payoutMethods.paypal;
+    
+    if (method === 'bankTransfer' && !user.payoutMethods.bankTransfer?.accountNumber) return next(new Error('Bank account is not configured'));
+    else if (method === 'bankTransfer') payoutDetails = `Acct: ${user.payoutMethods.bankTransfer.accountNumber}, IFSC: ${user.payoutMethods.bankTransfer.ifscCode}`;
 
     // Calculate 80/20 split
     const BROKER_SHARE = 0.80;
@@ -109,9 +124,9 @@ const requestWithdrawal = async (req, res, next) => {
       amount: brokerPayout,
       type: 'withdrawal',
       status: 'pending',
-      note: `Payout request: $${brokerPayout} to ${user.cryptoWallet.address} (${user.cryptoWallet.currency}). Platform fee: $${platformFee}`,
-      payoutAddress: user.cryptoWallet.address,
-      payoutCurrency: user.cryptoWallet.currency,
+      note: `Payout request: $${brokerPayout} via ${method.toUpperCase()} [${payoutDetails}]. Platform fee: $${platformFee}`,
+      payoutAddress: payoutDetails,
+      payoutCurrency: method,
     });
 
     res.status(201).json({
@@ -145,7 +160,7 @@ const getTransactions = async (req, res, next) => {
 
 module.exports = {
   getWallet,
-  updateCryptoWallet,
+  updatePayoutMethods,
   requestWithdrawal,
   getTransactions
 };

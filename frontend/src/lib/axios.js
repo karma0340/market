@@ -1,15 +1,9 @@
 import axios from 'axios';
-import { useAuthStore } from '../store/useAuthStore';
 
-let baseURL = process.env.NEXT_PUBLIC_API_URL;
-
-// If no API URL is provided, default to /api for relative proxying via Next.js rewrites
-if (!baseURL) {
-  baseURL = typeof window === 'undefined' ? 'http://localhost:5000/api' : '/api';
-}
-
-// Auto-append /api if missing from an absolute URL
-if (baseURL && !baseURL.endsWith('/api') && baseURL.startsWith('http')) {
+// Use NEXT_PUBLIC_API_URL directly (e.g. http://127.0.0.1:5000)
+// and append /api if not already present.
+let baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+if (!baseURL.endsWith('/api')) {
   baseURL = baseURL.replace(/\/$/, '') + '/api';
 }
 
@@ -17,22 +11,29 @@ const api = axios.create({
   baseURL,
 });
 
+let authToken = null;
+
+export const setAuthToken = (token) => {
+  authToken = token;
+};
+
 // Request interceptor to add the auth token header to requests
 api.interceptors.request.use(
   (config) => {
-    // In Next.js client side, we can get token from local storage
-    if (typeof window !== 'undefined') {
+    let token = authToken;
+
+    if (!token && typeof window !== 'undefined') {
       const authStorage = localStorage.getItem('auth-storage');
       if (authStorage) {
         try {
           const { state } = JSON.parse(authStorage);
-          if (state.token) {
-            config.headers.Authorization = `Bearer ${state.token}`;
-          }
-        } catch (e) {
-          console.error("Error parsing auth storage", e);
-        }
+          token = state?.token;
+        } catch (e) {}
       }
+    }
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -44,12 +45,16 @@ api.interceptors.request.use(
 // Response interceptor to handle token expiration (401 errors)
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response && error.response.status === 401) {
       // Token expired or invalid - trigger logout
       if (typeof window !== 'undefined') {
-        useAuthStore.getState().logout();
-        // Optional: Redirect to login or show message
+        // Clear local token bridge
+        authToken = null;
+        
+        // Use window.location as a fallback if dynamic import is tricky
+        // But the safest way to clear the store without circular import is to clear storage
+        localStorage.removeItem('auth-storage');
         window.location.href = '/login?expired=true';
       }
     }

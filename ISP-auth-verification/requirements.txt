@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+httpx
+httpx[http2]        
+pydantic
+cachetools
+requests
+pycryptodome
+playwright
+

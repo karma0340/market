@@ -13,13 +13,56 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
+    required: function() {
+      return this.authProvider === 'local';
+    },
     select: false, // Don't return password by default
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google', 'github'],
+    default: 'local'
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
+  },
+  githubId: {
+    type: String,
+    sparse: true,
+    unique: true
   },
   role: {
     type: String,
     enum: ['user', 'broker', 'admin'],
     default: 'user',
+  },
+  brokerStatus: {
+    type: String,
+    enum: ['none', 'pending', 'approved', 'rejected'],
+    default: 'none',
+  },
+  rejectionReason: {
+    type: String,
+    default: '',
+  },
+  phone: {
+    type: String,
+    default: null,
+  },
+  isPhoneVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationData: {
+    operator: { type: String, default: null },
+    profileData: { type: mongoose.Schema.Types.Mixed, default: null },
+    verifiedAt: { type: Date, default: null },
+  },
+  avatar: {
+    type: String,
+    default: null,
   },
   wallet: {
     balance: {
@@ -31,13 +74,35 @@ const userSchema = new mongoose.Schema({
       default: 0,
     }
   },
-  payoutMethod: {
-    type: String, // e.g., 'upi:user@upi', 'crypto:0x...', 'bank:acc_number'
-    default: null
+  payoutMethods: {
+    crypto: {
+      address: { type: String, default: null },
+      currency: { type: String, default: 'usdttrc20' }
+    },
+    gpay: { type: String, default: null },
+    upi: { type: String, default: null },
+    paypal: { type: String, default: null },
+    bankTransfer: {
+      accountName: { type: String, default: null },
+      accountNumber: { type: String, default: null },
+      ifscCode: { type: String, default: null },
+      bankName: { type: String, default: null }
+    }
   },
-  cryptoWallet: {
-    address: { type: String, default: null },
-    currency: { type: String, default: 'usdttrc20' } // USDT on TRC20 network by default
+  brokerDetails: {
+    specialization: { type: String, enum: ['housing', 'gadgets', 'notes', 'tutoring', 'repairs', 'other'], default: 'other' },
+    bio: { type: String, default: '' },
+    rating: { type: Number, default: 0 },
+    totalLeads: { type: Number, default: 0 },
+    verifiedCampus: { type: Boolean, default: false }
+  },
+  registrationIp: {
+    type: String,
+    default: null,
+  },
+  lastIp: {
+    type: String,
+    default: null,
   }
 }, {
   timestamps: true

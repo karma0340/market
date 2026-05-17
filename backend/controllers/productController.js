@@ -2,6 +2,8 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const path = require('path');
 const fs = require('fs');
+const { processNotes } = require('../services/aiService');
+const storageService = require('../services/storageService');
 
 // @desc    Create a product with local file upload
 // @route   POST /api/products
@@ -9,38 +11,68 @@ const fs = require('fs');
 const createProduct = async (req, res, next) => {
   try {
     const { title, description, price, currency, images, category, demoUrl } = req.body;
-    
-    if (!req.file) {
+
+    const productFile = req.files && req.files['productFile'] ? req.files['productFile'][0] : null;
+    const productImages = req.files && req.files['productImages'] ? req.files['productImages'] : [];
+    const githubRepo = req.body.githubRepo;
+
+    if (!productFile && !githubRepo) {
       res.status(400);
-      return next(new Error('Please upload a product file'));
+      return next(new Error('Please upload a product file or provide a GitHub repository link'));
     }
 
-    // Save relative path to DB so we can locate it easily later
-    const filePath = req.file.path;
+    // Save master file (ZIP/PDF) or use GitHub URL
+    const filePath = githubRepo ? githubRepo : await storageService.saveFile(productFile);
 
-    // Parse images if it's sent as a JSON string from FormData
-    let parsedImages = images;
-    if (typeof images === 'string') {
-      try {
-        parsedImages = JSON.parse(images);
-      } catch(e) {
-        // If it's a single string URL not in JSON array format
-        parsedImages = [images];
+    // Process images: optimize and convert to WebP
+    let finalImages = [];
+    
+    // Add file upload paths (optimized)
+    if (productImages.length > 0) {
+      const optimizedImages = await Promise.all(
+        productImages.map(img => storageService.optimizeImage(img))
+      );
+      finalImages = optimizedImages;
+    }
+
+    // Add JSON provided images if any
+    if (images) {
+      let parsedImages = images;
+      if (typeof images === 'string') {
+        try {
+          parsedImages = JSON.parse(images);
+        } catch(e) {
+          parsedImages = [images];
+        }
       }
+      const extraImages = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
+      // Filter out empty strings or duplicates if needed
+      finalImages = [...finalImages, ...extraImages.filter(img => img && !img.startsWith('data:'))]; 
     }
 
     const product = await Product.create({
       title,
       description,
       price: Number(price),
-      images: Array.isArray(parsedImages) ? parsedImages : [parsedImages],
+      images: finalImages,
       filePath,
       category,
       demoUrl,
       currency: currency || 'USD',
       sellerId: req.user._id,
-      status: 'approved' // Automatically approve for now to make it easier for the user
+      status: 'approved' 
     });
+
+    // --- AI SMART NOTES TRIGGER ---
+    if (category === 'notes') {
+      // Process AI in background so user doesn't wait
+      processNotes(title, description).then(async (metadata) => {
+        await Product.findByIdAndUpdate(product._id, {
+          aiMetadata: { ...metadata, isProcessed: true }
+        });
+        console.log(`AI: Smart content generated for "${title}"`);
+      }).catch(err => console.error('AI Processing Background Error:', err));
+    }
 
     res.status(201).json(product);
   } catch (error) {
@@ -115,6 +147,10 @@ const downloadProductFile = async (req, res, next) => {
       return next(new Error('Product file not found'));
     }
 
+    if (product.filePath.startsWith('http://') || product.filePath.startsWith('https://')) {
+      return res.json({ downloadUrl: product.filePath, isExternal: true });
+    }
+
     const absolutePath = path.resolve(product.filePath);
     
     // Check if file exists on disk
@@ -153,15 +189,10 @@ const updateProduct = async (req, res, next) => {
 
     const { title, description, price, currency, images, category, demoUrl } = req.body;
 
-    // Handle images if provided as JSON string
-    let parsedImages = images;
-    if (images && typeof images === 'string') {
-      try {
-        parsedImages = JSON.parse(images);
-      } catch (e) {
-        parsedImages = [images];
-      }
-    }
+    // Handle Files from upload.fields
+    const productFile = req.files && req.files['productFile'] ? req.files['productFile'][0] : null;
+    const productImages = req.files && req.files['productImages'] ? req.files['productImages'] : [];
+    const githubRepo = req.body.githubRepo;
 
     const updateData = {
       title: title || product.title,
@@ -172,19 +203,47 @@ const updateProduct = async (req, res, next) => {
       demoUrl: demoUrl !== undefined ? demoUrl : product.demoUrl,
     };
 
-    if (parsedImages) {
-      updateData.images = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
+    // Update images
+    let finalImages = [...product.images];
+    
+    if (productImages.length > 0) {
+      const optimizedImages = await Promise.all(
+        productImages.map(img => storageService.optimizeImage(img))
+      );
+      finalImages = [...finalImages, ...optimizedImages];
     }
 
+    if (images) {
+      let parsedImages = images;
+      if (typeof images === 'string') {
+        try {
+          parsedImages = JSON.parse(images);
+        } catch (e) {
+          parsedImages = [images];
+        }
+      }
+      const extraImages = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
+      finalImages = [...finalImages, ...extraImages.filter(img => img && !img.startsWith('data:'))];
+    }
+    
+    updateData.images = finalImages;
+
     // Handle File Update
-    if (req.file) {
-      // Delete old file if it exists
-      if (product.filePath && fs.existsSync(product.filePath)) {
+    if (githubRepo) {
+      if (product.filePath && !product.filePath.startsWith('http') && fs.existsSync(product.filePath)) {
         fs.unlink(product.filePath, (err) => {
           if (err) console.error('Failed to delete old file during update', err);
         });
       }
-      updateData.filePath = req.file.path;
+      updateData.filePath = githubRepo;
+    } else if (productFile) {
+      // Delete old file if it exists
+      if (product.filePath && !product.filePath.startsWith('http') && fs.existsSync(product.filePath)) {
+        fs.unlink(product.filePath, (err) => {
+          if (err) console.error('Failed to delete old file during update', err);
+        });
+      }
+      updateData.filePath = productFile.path;
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, updateData, {

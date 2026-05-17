@@ -2,6 +2,7 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 const { createRazorpayOrder, verifyRazorpaySignature } = require('../services/razorpayService');
 const { createStripeCheckoutSession, constructStripeEvent } = require('../services/stripeService');
@@ -27,10 +28,10 @@ const initiatePayment = async (req, res, next) => {
     }
 
     // Check if user already purchased any of these products
-    const existingOrders = await Order.find({ 
-      userId, 
-      productId: { $in: productIds }, 
-      status: 'paid' 
+    const existingOrders = await Order.find({
+      userId,
+      productId: { $in: productIds },
+      status: 'paid'
     }).populate('productId', 'title');
 
     if (existingOrders.length > 0) {
@@ -40,7 +41,7 @@ const initiatePayment = async (req, res, next) => {
     }
 
     const USD_TO_INR = Number(process.env.USD_TO_INR_RATE) || 84;
-    
+
     // Calculate totals in both currencies
     let totalUSD = 0;
     let totalINR = 0;
@@ -57,7 +58,7 @@ const initiatePayment = async (req, res, next) => {
     });
 
     // Create pending orders for all products
-    const orders = await Promise.all(products.map(product => 
+    const orders = await Promise.all(products.map(product =>
       Order.create({
         userId,
         productId: product._id,
@@ -89,9 +90,9 @@ const initiatePayment = async (req, res, next) => {
         }
 
         const rzOrder = await createRazorpayOrder(roundedTotalINR, tempPaymentId);
-        
+
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: rzOrder.id });
-        
+
         paymentData = { pgOrderId: rzOrder.id, currency: rzOrder.currency, amount: rzOrder.amount };
         break;
       }
@@ -106,18 +107,18 @@ const initiatePayment = async (req, res, next) => {
         }));
 
         const session = await createStripeCheckoutSession(normalizedProducts, tempPaymentId);
-        
+
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: session.id });
-        
+
         paymentData = { url: session.url };
         break;
       }
 
       case 'crypto': {
         const invoice = await createCryptoInvoice(totalUSD, tempPaymentId, `Bulk purchase of ${products.length} items`);
-        
+
         await Order.updateMany({ _id: { $in: orders.map(o => o._id) } }, { paymentId: invoice.invoice_id });
-        
+
         paymentData = { invoiceUrl: invoice.invoice_url };
         break;
       }
@@ -147,7 +148,7 @@ const initiatePayment = async (req, res, next) => {
 const processSuccessfulPayment = async (paymentId, actualPGId) => {
   // Find all orders linked to this payment ID
   const orders = await Order.find({ paymentId, status: 'pending' }).populate('productId');
-  
+
   if (orders.length === 0) {
     console.log(`[PAYMENT] No pending orders found for paymentId: ${paymentId}`);
     return;
@@ -195,8 +196,27 @@ const processSuccessfulPayment = async (paymentId, actualPGId) => {
         note: `Commission from ${order.productId.title}`
       }
     ]);
+
+    // Send Notification to Broker
+    await Notification.create({
+      type: 'product_sold',
+      title: 'Asset Sold!',
+      message: `Your asset "${order.productId.title}" has been sold. You earned $${sellerEarningsInUSD.toFixed(2)}.`,
+      forRole: 'broker',
+      forUser: sellerId,
+      data: { orderId: order._id, amount: sellerEarningsInUSD }
+    });
+
+    // Send Notification to Admin
+    await Notification.create({
+      type: 'new_order',
+      title: 'New Order Completed',
+      message: `User purchased "${order.productId.title}". Platform earned $${platformFee.toFixed(2)}.`,
+      forRole: 'admin',
+      data: { orderId: order._id, platformFee }
+    });
   }
-  
+
   console.log(`[PAYMENT] Successfully processed ${orders.length} orders for paymentId: ${paymentId}`);
 };
 

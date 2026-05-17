@@ -34,8 +34,17 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['templates', 'courses', 'software', 'assets'],
+    enum: ['templates', 'courses', 'software', 'assets', 'notes'],
     default: 'assets',
+  },
+  aiMetadata: {
+    summary: { type: String, default: '' },
+    flashcards: [{
+      front: String,
+      back: String
+    }],
+    keyTerms: [String],
+    isProcessed: { type: Boolean, default: false }
   },
   status: {
     type: String,

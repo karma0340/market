@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  initiatePayment, 
-  verifyRazorpay, 
+const {
+  initiatePayment,
+  verifyRazorpay,
   razorpayWebhook,
-  stripeWebhook, 
-  nowpaymentsWebhook 
+  stripeWebhook,
+  nowpaymentsWebhook
 } = require('../controllers/paymentController');
 const { protect } = require('../middlewares/authMiddleware');
 

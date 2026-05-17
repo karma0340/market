@@ -2,8 +2,206 @@ const Product = require('../models/Product');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const Order = require('../models/Order');
+const Notification = require('../models/Notification');
 const { executeCryptoPayout } = require('../services/nowpaymentsService');
 const PDFDocument = require('pdfkit');
+
+// ────────────────────────────────────────────────────────────────────────
+// DASHBOARD STATS
+// ────────────────────────────────────────────────────────────────────────
+
+// @desc    Get admin dashboard statistics
+// @route   GET /api/admin/stats
+// @access  Private/Admin
+const getDashboardStats = async (req, res, next) => {
+  try {
+    const [totalUsers, totalBrokers, totalProducts, totalOrders, paidOrders, pendingBrokers] = await Promise.all([
+      User.countDocuments({}),
+      User.countDocuments({ role: 'broker' }),
+      Product.countDocuments({}),
+      Order.countDocuments({}),
+      Order.find({ status: 'paid' }),
+      User.countDocuments({ role: 'broker', brokerStatus: 'pending' }),
+    ]);
+
+    // Total revenue from paid orders
+    const totalRevenueUSD = paidOrders.filter(o => o.currency !== 'INR').reduce((sum, o) => sum + (o.amount || 0), 0);
+    const totalRevenueINR = paidOrders.filter(o => o.currency === 'INR').reduce((sum, o) => sum + (o.amount || 0), 0);
+
+    // Monthly revenue for the last 12 months
+    const now = new Date();
+    const monthlyRevenue = [];
+    for (let i = 11; i >= 0; i--) {
+      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+      const monthOrders = paidOrders.filter(o => {
+        const d = new Date(o.createdAt);
+        return d >= start && d <= end;
+      });
+      const revenue = monthOrders.reduce((sum, o) => sum + (o.amount || 0), 0);
+      monthlyRevenue.push({
+        month: start.toLocaleString('default', { month: 'short' }),
+        year: start.getFullYear(),
+        revenue,
+        orders: monthOrders.length,
+      });
+    }
+
+    // Top selling products (by order count)
+    const ordersByProduct = {};
+    paidOrders.forEach(o => {
+      const pid = o.productId?.toString();
+      if (pid) {
+        ordersByProduct[pid] = (ordersByProduct[pid] || 0) + 1;
+      }
+    });
+    const topProductIds = Object.entries(ordersByProduct)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([id]) => id);
+
+    const topProducts = await Product.find({ _id: { $in: topProductIds } })
+      .populate('sellerId', 'name')
+      .lean();
+
+    const topProductsWithSales = topProducts.map(p => ({
+      ...p,
+      totalSales: ordersByProduct[p._id.toString()] || 0,
+      totalRevenue: paidOrders
+        .filter(o => o.productId?.toString() === p._id.toString())
+        .reduce((sum, o) => sum + (o.amount || 0), 0),
+    })).sort((a, b) => b.totalSales - a.totalSales);
+
+    // Recent orders
+    const recentOrders = await Order.find({})
+      .populate('userId', 'name email')
+      .populate('productId', 'title price')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // Recent users
+    const recentUsers = await User.find({})
+      .select('name email role brokerStatus createdAt')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    res.json({
+      totalUsers,
+      totalBrokers,
+      totalProducts,
+      totalOrders,
+      totalRevenueUSD,
+      totalRevenueINR,
+      pendingBrokers,
+      monthlyRevenue,
+      topProducts: topProductsWithSales,
+      recentOrders,
+      recentUsers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────
+// BROKER APPROVAL
+// ────────────────────────────────────────────────────────────────────────
+
+// @desc    Get all pending broker applications
+// @route   GET /api/admin/brokers/pending
+// @access  Private/Admin
+const getPendingBrokers = async (req, res, next) => {
+  try {
+    const brokers = await User.find({ role: 'broker', brokerStatus: 'pending' })
+      .select('-password')
+      .sort({ createdAt: -1 });
+    res.json(brokers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all brokers
+// @route   GET /api/admin/brokers
+// @access  Private/Admin
+const getAllBrokers = async (req, res, next) => {
+  try {
+    const brokers = await User.find({ role: 'broker' })
+      .select('-password')
+      .sort({ createdAt: -1 });
+    res.json(brokers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Approve a broker application
+// @route   PUT /api/admin/brokers/:id/approve
+// @access  Private/Admin
+const approveBroker = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404);
+      return next(new Error('User not found'));
+    }
+    if (user.role !== 'broker') {
+      res.status(400);
+      return next(new Error('User is not a broker'));
+    }
+
+    user.brokerStatus = 'approved';
+    await user.save();
+
+    // Notify the broker
+    await Notification.create({
+      type: 'broker_approved',
+      title: 'Broker Application Approved!',
+      message: 'Congratulations! Your broker application has been approved. You can now start selling digital assets.',
+      forUser: user._id,
+      fromUser: req.user._id,
+    });
+
+    res.json({ message: 'Broker approved successfully', user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reject a broker application
+// @route   PUT /api/admin/brokers/:id/reject
+// @access  Private/Admin
+const rejectBroker = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(404);
+      return next(new Error('User not found'));
+    }
+
+    user.brokerStatus = 'rejected';
+    user.rejectionReason = reason || 'Application did not meet our requirements.';
+    await user.save();
+
+    // Notify the broker
+    await Notification.create({
+      type: 'broker_rejected',
+      title: 'Broker Application Update',
+      message: `Your broker application has been reviewed. Reason: ${user.rejectionReason}`,
+      forUser: user._id,
+      fromUser: req.user._id,
+    });
+
+    res.json({ message: 'Broker rejected', user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ────────────────────────────────────────────────────────────────────────
+// EXISTING ENDPOINTS (preserved)
+// ────────────────────────────────────────────────────────────────────────
 
 // @desc    Get all pending products
 // @route   GET /api/admin/products/pending
@@ -48,6 +246,17 @@ const updateProductStatus = async (req, res, next) => {
 
     product.status = status;
     await product.save();
+
+    // Notify the seller
+    const notifType = status === 'approved' ? 'product_approved' : status === 'rejected' ? 'product_rejected' : 'system';
+    await Notification.create({
+      type: notifType,
+      title: `Product ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      message: `Your product "${product.title}" has been ${status}.`,
+      forUser: product.sellerId,
+      fromUser: req.user._id,
+      data: { productId: product._id },
+    });
 
     res.json({ message: `Product ${status} successfully`, product });
   } catch (error) {
@@ -105,12 +314,10 @@ const approveWithdrawal = async (req, res, next) => {
           transaction.amount,
           transaction.payoutCurrency
         );
-        // Store the transaction ID from NOWPayments for tracking
         const txId = payoutResult?.withdrawals?.[0]?.id || payoutResult?.batch_withdrawal_id || 'sent';
         transaction.payoutTxId = txId;
         console.log(`[Admin] Crypto payout sent. Tx ID: ${txId}`);
       } catch (payoutError) {
-        // Log the error but don't block the approval — admin can retry manually
         console.error('[Admin] Auto crypto payout failed:', payoutError.message);
         transaction.note = (transaction.note || '') + ` | PAYOUT ERROR: ${payoutError.message}`;
       }
@@ -123,6 +330,15 @@ const approveWithdrawal = async (req, res, next) => {
     if (user) {
       user.wallet.pending -= transaction.amount;
       await user.save();
+
+      // Notify broker
+      await Notification.create({
+        type: 'withdrawal_approved',
+        title: 'Withdrawal Approved',
+        message: `Your withdrawal of $${transaction.amount} has been processed.`,
+        forUser: user._id,
+        fromUser: req.user._id,
+      });
     }
 
     res.json({ message: 'Withdrawal approved and crypto payout initiated successfully' });
@@ -174,13 +390,11 @@ const generateInvoice = async (req, res, next) => {
 
     const doc = new PDFDocument({ margin: 50 });
 
-    // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=invoice_${order._id}.pdf`);
 
     doc.pipe(res);
 
-    // --- Header ---
     doc.fillColor('#444444').fontSize(20).text('DigitalMarket', 50, 50);
     doc.fontSize(10).text('Elite Digital Asset Marketplace', 50, 75);
     doc.fontSize(10).text('invoice@digitalmarket.app', 50, 90);
@@ -192,19 +406,16 @@ const generateInvoice = async (req, res, next) => {
 
     doc.moveTo(50, 130).lineTo(550, 130).stroke();
 
-    // --- Bill To ---
     doc.fontSize(12).fillColor('#333333').text('BILL TO:', 50, 150);
     doc.fontSize(10).fillColor('#000000').text(order.userId.name, 50, 170);
     doc.text(order.userId.email, 50, 185);
 
-    // --- Table Header ---
     const tableTop = 230;
     doc.fillColor('#F0F0F0').rect(50, tableTop, 500, 20).fill();
     doc.fillColor('#333333').fontSize(10).text('Description', 60, tableTop + 5);
     doc.text('Quantity', 350, tableTop + 5, { width: 50, align: 'center' });
     doc.text('Price', 400, tableTop + 5, { width: 150, align: 'right' });
 
-    // --- Table Row ---
     doc.fillColor('#000000').text(order.productId.title, 60, tableTop + 30);
     doc.text('1', 350, tableTop + 30, { width: 50, align: 'center' });
     const currency = order.currency === 'INR' ? 'INR' : 'USD';
@@ -213,11 +424,9 @@ const generateInvoice = async (req, res, next) => {
 
     doc.moveTo(50, tableTop + 50).lineTo(550, tableTop + 50).stroke();
 
-    // --- Total ---
     doc.fontSize(12).font('Helvetica-Bold').text('TOTAL:', 350, tableTop + 70);
     doc.fontSize(14).text(`${symbol} ${order.amount}`, 400, tableTop + 70, { width: 150, align: 'right' });
 
-    // --- Footer ---
     doc.fontSize(10).font('Helvetica').fillColor('#888888').text(
       'Thank you for your business. All digital asset sales are final.',
       50, 700, { align: 'center', width: 500 }
@@ -230,6 +439,11 @@ const generateInvoice = async (req, res, next) => {
 };
 
 module.exports = {
+  getDashboardStats,
+  getPendingBrokers,
+  getAllBrokers,
+  approveBroker,
+  rejectBroker,
   getPendingProducts,
   getAllProducts,
   updateProductStatus,
