@@ -418,6 +418,7 @@ export default function BrokerDashboard() {
 
           const finalStats = {
             totalEarningsUSD: stats?.totalEarningsUSD || defaultStats.totalEarningsUSD,
+            totalEarningsINR: stats?.totalEarningsINR || 0,
             totalSold: stats?.totalSold || defaultStats.totalSold,
             activeListings: stats?.activeListings || defaultStats.activeListings,
             dailyPerformance: stats?.dailyPerformance?.length ? stats.dailyPerformance.map(d => ({
@@ -430,6 +431,7 @@ export default function BrokerDashboard() {
               title: p.title,
               sales: p.sales,
               revenue: p.revenue,
+              currency: p.currency || 'USD',
               iconColor: idx === 0 ? 'from-[#00D2FF] to-[#0070FF]' : idx === 1 ? 'from-[#10B981] to-[#00D2FF]' : 'from-[#b200ff] to-[#ff007f]'
             })) : defaultStats.topProducts,
             recentOrders: stats?.recentOrders?.length ? stats.recentOrders.map((o, idx) => ({
@@ -454,7 +456,14 @@ export default function BrokerDashboard() {
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#64748B]">Total Earnings</span>
                   <div className="flex items-end justify-between mt-2">
                     <div>
-                      <p className="text-3xl font-extrabold text-white tracking-tight">${finalStats.totalEarningsUSD.toLocaleString()}</p>
+                      {finalStats.totalEarningsINR > 0 ? (
+                        <p className="text-3xl font-extrabold text-white tracking-tight">₹{finalStats.totalEarningsINR.toLocaleString()}</p>
+                      ) : (
+                        <p className="text-3xl font-extrabold text-white tracking-tight">${finalStats.totalEarningsUSD.toLocaleString()}</p>
+                      )}
+                      {finalStats.totalEarningsINR > 0 && finalStats.totalEarningsUSD > 0 && (
+                        <span className="text-xs text-[#94A3B8] font-bold block mt-1">+ ${(finalStats.totalEarningsUSD).toLocaleString()} USD</span>
+                      )}
                       <span className="text-xs text-emerald-400 font-bold mt-1 inline-block">+18.4% <span className="text-[#64748B] font-semibold">this month</span></span>
                     </div>
                   </div>
@@ -529,7 +538,7 @@ export default function BrokerDashboard() {
                             <div className="w-32 bg-[#1E293B] h-2 rounded-full overflow-hidden shrink-0 hidden sm:block">
                               <div className="h-full bg-gradient-to-r from-[#b200ff] to-[#ff007f] rounded-full group-hover:scale-x-105 origin-left transition-transform duration-500" style={{ width: `${Math.min((p.sales / 500) * 100, 100)}%` }} />
                             </div>
-                            <span className="text-sm font-black text-[#ff007f]">${(p.revenue / 1000).toFixed(1)}K</span>
+                            <span className="text-sm font-black text-[#ff007f]">{p.currency === 'INR' ? '₹' : '$'}{(p.revenue / 1000).toFixed(1)}K</span>
                           </div>
                         </div>
                       ))}
@@ -547,7 +556,7 @@ export default function BrokerDashboard() {
                         <div key={idx} className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] font-bold text-[#94A3B8] truncate max-w-[140px]">{p.title}</span>
-                            <span className="text-[10px] font-bold text-[#ff007f]">{p.sales} units | ${(p.revenue / 1000).toFixed(1)}K</span>
+                            <span className="text-[10px] font-bold text-[#ff007f]">{p.sales} units | {p.currency === 'INR' ? '₹' : '$'}{(p.revenue / 1000).toFixed(1)}K</span>
                           </div>
                           <div className="h-1.5 w-full bg-[#1E293B] rounded-full overflow-hidden shadow-inner">
                             <div className={`h-full rounded-full bg-gradient-to-r ${idx % 2 === 0 ? 'from-[#ff007f] to-[#b200ff]' : 'from-[#b200ff] to-[#00D2FF]'}`} style={{ width: `${Math.min((p.sales / 350) * 100, 100)}%` }} />

@@ -19,7 +19,7 @@ exports.getBrokerStats = async (req, res, next) => {
     const paidOrders = await Order.find({ 
       productId: { $in: productIds }, 
       status: 'paid' 
-    }).populate('productId', 'title price').populate('userId', 'name email');
+    }).populate('productId', 'title price currency').populate('userId', 'name email');
 
     const totalEarningsUSD = paidOrders.filter(o => o.currency !== 'INR').reduce((sum, o) => sum + (o.amount || 0), 0) * 0.8;
     const totalEarningsINR = paidOrders.filter(o => o.currency === 'INR').reduce((sum, o) => sum + (o.amount || 0), 0) * 0.8;
@@ -70,6 +70,7 @@ exports.getBrokerStats = async (req, res, next) => {
         _id: p.product._id,
         title: p.product.title,
         price: p.product.price,
+        currency: p.product.currency || 'USD',
         sales: p.sales,
         revenue: Math.round(p.revenue * 100) / 100,
       }));
