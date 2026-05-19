@@ -11,6 +11,14 @@ const api = axios.create({
   baseURL,
 });
 
+export const getImageUrl = (img) => {
+  if (!img) return 'https://via.placeholder.com/800';
+  if (img.startsWith('http') || img.startsWith('data:')) return img;
+  // Resolve relative paths by prefixing the base API URL (excluding /api)
+  const baseUrlClean = baseURL.replace(/\/api$/, '');
+  return `${baseUrlClean}/${img.replace(/\\/g, '/')}`;
+};
+
 let authToken = null;
 
 export const setAuthToken = (token) => {

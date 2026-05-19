@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { Trash2, CreditCard, ShieldCheck, ArrowRight, Package, Landmark, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import api from '@/lib/axios';
+import api, { getImageUrl } from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import LottieSpotlight from '@/components/LottieSpotlight';
@@ -207,7 +207,7 @@ export default function CartPage() {
                     style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}
                   >
                     <img
-                      src={item.product.images[0] || 'https://via.placeholder.com/150'}
+                      src={getImageUrl(item.product.images[0])}
                       alt={item.product.title}
                       className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />

@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import toast from 'react-hot-toast';
 import LottieSpotlight from '@/components/LottieSpotlight';
+import { getImageUrl } from '@/lib/axios';
 
 export default function ProductsPage() {
   const { products, fetchProducts, isLoading } = useProductStore();
@@ -226,7 +227,7 @@ export default function ProductsPage() {
                     style={{ background: 'var(--bg-surface)' }}
                   >
                     <img
-                      src={product.images[0] || 'https://via.placeholder.com/600'}
+                      src={getImageUrl(product.images[0])}
                       alt={product.title}
                       className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />

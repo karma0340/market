@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartStore } from '@/store/useCartStore';
-import api from '@/lib/axios';
+import api, { getImageUrl } from '@/lib/axios';
 import toast from 'react-hot-toast';
 import {
   Download, Clock, ShieldCheck,
@@ -326,7 +326,7 @@ export default function UserDashboard() {
                           <div className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-[#020617] border border-[#1E293B] relative group-hover:border-[#00D2FF]/30 transition-colors">
                             <div className="absolute inset-0 bg-[#00D2FF]/10 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
                             <img
-                              src={order.productId?.images?.[0] || 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=400'}
+                              src={getImageUrl(order.productId?.images?.[0])}
                               alt={order.productId?.title}
                               className="h-full w-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-all duration-700"
                             />

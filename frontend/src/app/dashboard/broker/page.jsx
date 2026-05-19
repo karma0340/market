@@ -11,6 +11,7 @@ import { LayoutGrid, Package, BarChart3, Settings, DollarSign, ShoppingBag, Plus
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { NeonAreaChart, NeonLineChart, GlowingProgressCircle, AssetPerformanceChart } from '@/components/NeonCharts';
+import { getImageUrl } from '@/lib/axios';
 
 const TABS = [
   { id: 'overview', label: 'Dashboard', icon: LayoutGrid },
@@ -613,7 +614,7 @@ export default function BrokerDashboard() {
             {products.map(p => (
               <div key={p._id} className="flex items-center gap-4 p-4 rounded-2xl border border-[#1E293B] bg-[#0F172A] hover:border-[#b200ff]/30 transition-all">
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#1E293B] shrink-0 border border-[#334155]">
-                  {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />}
+                  {p.images?.[0] && <img src={getImageUrl(p.images[0])} alt={p.title} className="w-full h-full object-cover" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-white truncate">{p.title}</p>

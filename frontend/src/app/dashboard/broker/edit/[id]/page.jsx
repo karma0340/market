@@ -8,7 +8,7 @@ import {
   Image as ImageIcon, Clipboard, CheckCircle2,
   FolderOpen, Smartphone, Zap, ChevronRight, Github, Edit
 } from 'lucide-react';
-import api from '@/lib/axios';
+import api, { getImageUrl } from '@/lib/axios';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -339,7 +339,7 @@ export default function EditProductPage() {
                           animate={{ scale: 1, opacity: 1 }}
                           className="aspect-square w-full rounded-xl overflow-hidden border border-white/10 relative group shadow-lg"
                         >
-                          <img src={imgUrl} className="w-full h-full object-cover" />
+                          <img src={getImageUrl(imgUrl)} className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => removeExistingImage(idx)}
