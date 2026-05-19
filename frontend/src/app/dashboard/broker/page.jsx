@@ -646,8 +646,8 @@ export default function BrokerDashboard() {
                         <p className="text-[#64748B] text-[10px]">{o.buyerEmail}</p>
                       </td>
                       <td className="py-3.5 text-center text-[#94A3B8] text-xs">{new Date(o.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                      <td className="py-3.5 text-right text-[#94A3B8] font-mono">${(o.amount || 0).toFixed(2)}</td>
-                      <td className="py-3.5 px-5 text-right font-bold text-emerald-400 font-mono">+${(o.brokerEarnings || 0).toFixed(2)}</td>
+                      <td className="py-3.5 text-right text-[#94A3B8] font-mono">{o.currency === 'INR' ? '₹' : '$'}{(o.amount || 0).toFixed(2)}</td>
+                      <td className="py-3.5 px-5 text-right font-bold text-emerald-400 font-mono">+{o.currency === 'INR' ? '₹' : '$'}{(o.brokerEarnings || 0).toFixed(2)}</td>
                     </tr>
                   ))}
                   {(!stats?.recentOrders || stats.recentOrders.length === 0) && (

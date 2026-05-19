@@ -84,6 +84,7 @@ exports.getBrokerStats = async (req, res, next) => {
         buyerEmail: o.userId?.email || '',
         product: o.productId?.title || 'Unknown',
         amount: o.amount,
+        currency: o.currency || 'USD',
         brokerEarnings: Math.round(o.amount * 0.8 * 100) / 100,
         date: o.createdAt,
         status: o.status,
