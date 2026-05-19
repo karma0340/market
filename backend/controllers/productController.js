@@ -204,14 +204,7 @@ const updateProduct = async (req, res, next) => {
     };
 
     // Update images
-    let finalImages = [...product.images];
-    
-    if (productImages.length > 0) {
-      const optimizedImages = await Promise.all(
-        productImages.map(img => storageService.optimizeImage(img))
-      );
-      finalImages = [...finalImages, ...optimizedImages];
-    }
+    let finalImages = [];
 
     if (images) {
       let parsedImages = images;
@@ -223,7 +216,16 @@ const updateProduct = async (req, res, next) => {
         }
       }
       const extraImages = Array.isArray(parsedImages) ? parsedImages : [parsedImages];
-      finalImages = [...finalImages, ...extraImages.filter(img => img && !img.startsWith('data:'))];
+      finalImages = extraImages.filter(img => img && !img.startsWith('data:'));
+    } else {
+      finalImages = [...product.images];
+    }
+    
+    if (productImages.length > 0) {
+      const optimizedImages = await Promise.all(
+        productImages.map(img => storageService.optimizeImage(img))
+      );
+      finalImages = [...finalImages, ...optimizedImages];
     }
     
     updateData.images = finalImages;

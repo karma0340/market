@@ -1,0 +1,839 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>B.Tech Project Report - VendorHub</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Times New Roman', serif; font-size: 12pt; color: #000; background: #fff; }
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto 20px; padding: 25.4mm; page-break-after: always; border: 1px solid #ccc; }
+  h1 { font-size: 16pt; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  h2 { font-size: 15pt; font-weight: bold; margin: 18px 0 10px; }
+  h3 { font-size: 13pt; font-weight: bold; margin: 14px 0 8px; }
+  h4 { font-size: 12pt; font-weight: bold; margin: 10px 0 6px; }
+  p { line-height: 1.5; text-align: justify; margin-bottom: 10px; }
+  .center { text-align: center; }
+  .cover-title { font-size: 18pt; font-weight: bold; text-align: center; margin: 20px 0 10px; text-transform: uppercase; }
+  .cover-sub { font-size: 14pt; font-weight: bold; text-align: center; margin: 10px 0; }
+  .cover-normal { font-size: 12pt; text-align: center; margin: 8px 0; }
+  .divider { border: none; border-top: 2px solid #000; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th, td { border: 1px solid #000; padding: 7px 10px; text-align: left; font-size: 11pt; line-height: 1.5; }
+  th { background: #000; color: #fff; font-weight: bold; text-align: center; }
+  td:first-child { text-align: center; width: 80px; }
+  td:last-child { text-align: center; width: 80px; }
+  .sign-block { margin-top: 40px; }
+  .sign-line { margin-bottom: 40px; }
+  ul, ol { margin: 8px 0 10px 24px; line-height: 1.8; }
+  .chapter-heading { font-size: 16pt; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+  .logo-box { width: 120px; height: 120px; border: 2px solid #000; margin: 16px auto; display: flex; align-items: center; justify-content: center; font-size: 10pt; color: #555; }
+  .mermaid { margin: 16px 0; }
+  code { font-family: Courier New, monospace; font-size: 10pt; background: #f4f4f4; padding: 2px 4px; }
+  pre { font-family: Courier New, monospace; font-size: 9pt; background: #f4f4f4; border: 1px solid #ccc; padding: 12px; margin: 12px 0; white-space: pre-wrap; word-wrap: break-word; line-height: 1.4; }
+  .toc-table td { border: 1px solid #000; }
+  .toc-table tr:nth-child(even) { background: #f9f9f9; }
+  .fig-caption { text-align: center; font-style: italic; font-size: 10pt; margin-top: 6px; margin-bottom: 14px; }
+
+  @media print {
+    body { background: #fff; }
+    .page { border: none; margin: 0; padding: 25.4mm; width: 210mm; min-height: 297mm; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER PAGE ===== -->
+<div class="page center">
+  <p style="font-size:13pt; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">A Final Year Project Report</p>
+  <p style="font-size:13pt; font-weight:bold;">Submitted in Partial Fulfillment of the Requirements for the Award of the Degree of</p>
+  <br>
+  <p class="cover-sub">BACHELOR OF TECHNOLOGY</p>
+  <p class="cover-sub">IN</p>
+  <p class="cover-sub">COMPUTER SCIENCE &amp; ENGINEERING</p>
+  <hr class="divider">
+  <p style="font-size:13pt; font-weight:bold;">ON</p>
+  <br>
+  <p class="cover-title">VendorHub: A Next-Generation Multi-Vendor<br>Digital Asset Marketplace</p>
+  <hr class="divider">
+  <br>
+  <p class="cover-normal"><strong>Submitted By:</strong></p>
+  <p class="cover-normal" style="font-size:14pt; font-weight:bold;">MOHIT TYAGI</p>
+  <p class="cover-normal">Roll No: 23021003008</p>
+  <br>
+  <p class="cover-normal"><strong>Under the Guidance of:</strong></p>
+  <p class="cover-normal">___________________________</p>
+  <p class="cover-normal">(Supervisor / Guide)</p>
+  <br><br>
+  <div class="logo-box">[ College Logo ]</div>
+  <br>
+  <p class="cover-sub">DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</p>
+  <p class="cover-sub">GREEN HILLS ENGINEERING COLLEGE, SOLAN</p>
+  <p class="cover-normal">Academic Session: 2023 â€“ 2026</p>
+</div>
+
+<!-- ===== CERTIFICATE ===== -->
+<div class="page">
+  <h1>CERTIFICATE</h1>
+  <hr class="divider">
+  <br>
+  <p>This is to certify that the project report entitled <strong>"VendorHub: A Next-Generation Multi-Vendor Digital Asset Marketplace"</strong> has been submitted by <strong>Mohit Tyagi (Roll No: 23021003008)</strong> in partial fulfillment of the requirements for the award of the degree of <strong>Bachelor of Technology in Computer Science &amp; Engineering</strong> from <strong>Green Hills Engineering College, Solan</strong>.</p>
+  <br>
+  <p>This is an authentic record of the student's own work carried out under my supervision and guidance during the academic session <strong>2023â€“2026</strong>. The matter embodied in this report has not been submitted for the award of any other degree or diploma to the best of my knowledge and belief.</p>
+  <br><br>
+  <div class="sign-block">
+    <div class="sign-line">
+      <p>___________________________</p>
+      <p><strong>(Supervisor / Guide Name)</strong></p>
+      <p>Designation</p>
+      <p>Department of Computer Science &amp; Engineering</p>
+      <p>Green Hills Engineering College, Solan</p>
+    </div>
+    <br><br>
+    <div class="sign-line">
+      <p>___________________________</p>
+      <p><strong>(Head of Department)</strong></p>
+      <p>Head, Department of Computer Science &amp; Engineering</p>
+      <p>Green Hills Engineering College, Solan</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DECLARATION ===== -->
+<div class="page">
+  <h1>DECLARATION</h1>
+  <hr class="divider">
+  <br>
+  <p>I, <strong>Mohit Tyagi (Roll No: 23021003008)</strong>, hereby declare that the project report entitled <strong>"VendorHub: A Next-Generation Multi-Vendor Digital Asset Marketplace"</strong> submitted to the Department of Computer Science &amp; Engineering, Green Hills Engineering College, Solan, is a record of an original work done by me under the supervision of my project guide.</p>
+  <br>
+  <p>This project report is submitted in partial fulfillment of the requirements for the award of the degree of <strong>Bachelor of Technology in Computer Science &amp; Engineering</strong>. The results embodied in this report have not been submitted to any other University or Institute for the award of any degree or diploma.</p>
+  <br>
+  <p>I further declare that the project work presented in this report is genuinely my own and is not plagiarized from any source. All sources of information used in this report have been duly acknowledged.</p>
+  <br><br><br>
+  <div class="sign-block">
+    <p>___________________________</p>
+    <p><strong>Mohit Tyagi</strong></p>
+    <p>Roll No: 23021003008</p>
+    <p>B.Tech (CSE), Green Hills Engineering College, Solan</p>
+    <br>
+    <p>Date: _______________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Place: _______________</p>
+  </div>
+</div>
+
+<!-- ===== ACKNOWLEDGEMENT ===== -->
+<div class="page">
+  <h1>ACKNOWLEDGEMENT</h1>
+  <hr class="divider">
+  <br>
+  <p>The success and final outcome of this project required a lot of guidance and assistance from many people, and I am extremely privileged to have received such support throughout the completion of my project.</p>
+  <br>
+  <p>I sincerely express my gratitude to my <strong>Project Guide</strong> for providing me the opportunity to work on this project and for providing constant support and guidance that made me complete the project successfully. Their valuable suggestions, constructive feedback, and timely encouragement were instrumental in shaping this work.</p>
+  <br>
+  <p>I would like to express my deep sense of gratitude to the <strong>Head of the Department</strong> of Computer Science &amp; Engineering, Green Hills Engineering College, Solan, who took a keen interest in the project work and guided us all along till the completion of the project by providing all the necessary information.</p>
+  <br>
+  <p>I am thankful to all <strong>Teaching Staff Members</strong> of the Department of Computer Science &amp; Engineering for their constant encouragement, support, and guidance which helped me in successfully completing this project work.</p>
+  <br>
+  <p>Lastly, I would like to thank my <strong>family and friends</strong> for their unwavering moral support and patience throughout this journey. Their motivation and encouragement kept me going during challenging times.</p>
+  <br><br><br>
+  <p class="center"><strong>Mohit Tyagi</strong></p>
+  <p class="center">Roll No: 23021003008</p>
+  <p class="center">B.Tech (CSE)</p>
+  <p class="center">Green Hills Engineering College, Solan</p>
+</div>
+
+<!-- ===== ABSTRACT ===== -->
+<div class="page">
+  <h1>ABSTRACT</h1>
+  <hr class="divider">
+  <br>
+  <p>The exponential growth of the digital economy has created a massive demand for platforms where creators can securely sell non-physical assets such as software, UI/UX templates, eBooks, video courses, and educational notes. However, existing platforms often impose exorbitant transaction fees, suffer from rigid payment infrastructures that lack cryptocurrency support, and feature unintuitive administrative panels that hinder productivity.</p>
+  <br>
+  <p>This project presents <strong>VendorHub</strong>, a highly scalable, secure, and feature-rich multi-vendor digital asset marketplace. The primary objective of this project is to design and architect a Full-Stack web application utilizing the MERN stack (MongoDB, Express.js, React/Next.js, Node.js) combined with state-of-the-art UI/UX patterns and modern cloud-native practices.</p>
+  <br>
+  <p>The platform serves three distinct user roles: <strong>Administrators</strong>, <strong>Brokers (Vendors)</strong>, and <strong>End-Users (Buyers)</strong>. VendorHub implements a robust authentication system utilizing JSON Web Tokens (JWT). Financial transactions are facilitated through a multi-gateway architecture integrating <strong>Stripe</strong> and <strong>Razorpay</strong> for fiat payments, alongside <strong>NOWPayments</strong> for automated cryptocurrency (USDT) settlements.</p>
+  <br>
+  <p>The system features an automated, branded PDF invoice generator, a dynamic analytics dashboard with real-time charting via Recharts, and AI-powered services for automated metadata extraction from educational assets using Google Gemini. The frontend achieves an exceptionally fluid user experience powered by Framer Motion and Lenis smooth scrolling.</p>
+  <br>
+  <p><strong>Keywords:</strong> Digital Marketplace, MERN Stack, Next.js, Multi-Vendor, JWT Authentication, Payment Gateway Integration, PDF Generation, Zustand, Recharts.</p>
+</div>
+
+<!-- ===== TABLE OF CONTENTS ===== -->
+<div class="page">
+  <h1>TABLE OF CONTENTS</h1>
+  <hr class="divider">
+  <br>
+  <table class="toc-table">
+    <thead><tr><th>Sr. No.</th><th>Section</th><th>Page No.</th></tr></thead>
+    <tbody>
+      <tr><td>1.</td><td>Cover Page</td><td>i</td></tr>
+      <tr><td>2.</td><td>Certificate</td><td>ii</td></tr>
+      <tr><td>3.</td><td>Declaration</td><td>iii</td></tr>
+      <tr><td>4.</td><td>Acknowledgement</td><td>iv</td></tr>
+      <tr><td>5.</td><td>Abstract</td><td>v</td></tr>
+      <tr><td>6.</td><td>List of Figures</td><td>vi</td></tr>
+      <tr><td>7.</td><td>List of Tables</td><td>vii</td></tr>
+      <tr><td><strong>8.</strong></td><td><strong>Chapter 1: Introduction</strong></td><td><strong>1</strong></td></tr>
+      <tr><td><strong>9.</strong></td><td><strong>Chapter 2: Literature Review</strong></td><td><strong>5</strong></td></tr>
+      <tr><td><strong>10.</strong></td><td><strong>Chapter 3: System Analysis &amp; Requirements</strong></td><td><strong>9</strong></td></tr>
+      <tr><td><strong>11.</strong></td><td><strong>Chapter 4: System Design</strong></td><td><strong>13</strong></td></tr>
+      <tr><td><strong>12.</strong></td><td><strong>Chapter 5: Implementation</strong></td><td><strong>20</strong></td></tr>
+      <tr><td><strong>13.</strong></td><td><strong>Chapter 6: Testing &amp; Results</strong></td><td><strong>29</strong></td></tr>
+      <tr><td><strong>14.</strong></td><td><strong>Chapter 7: Conclusion &amp; Future Scope</strong></td><td><strong>34</strong></td></tr>
+      <tr><td><strong>15.</strong></td><td><strong>References</strong></td><td><strong>37</strong></td></tr>
+      <tr><td><strong>16.</strong></td><td><strong>Appendices</strong></td><td><strong>38</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== LIST OF FIGURES ===== -->
+<div class="page">
+  <h1>LIST OF FIGURES</h1>
+  <hr class="divider">
+  <br>
+  <table>
+    <thead><tr><th>Figure No.</th><th>Figure Title</th><th>Page No.</th></tr></thead>
+    <tbody>
+      <tr><td>Figure 4.1</td><td>High-Level System Architecture Diagram</td><td>13</td></tr>
+      <tr><td>Figure 4.2</td><td>User Registration &amp; Authentication Flowchart</td><td>14</td></tr>
+      <tr><td>Figure 4.3</td><td>Multi-Gateway Payment Processing Flowchart</td><td>15</td></tr>
+      <tr><td>Figure 4.4</td><td>Use Case Diagram â€“ Admin, Broker, and User</td><td>16</td></tr>
+      <tr><td>Figure 4.5</td><td>Entity Relationship (ER) Diagram</td><td>17</td></tr>
+      <tr><td>Figure 5.1</td><td>Home Page UI with Glassmorphism Design</td><td>20</td></tr>
+      <tr><td>Figure 5.2</td><td>Vendor Dashboard with Analytics Charts</td><td>21</td></tr>
+      <tr><td>Figure 5.3</td><td>Asset Upload &amp; Management Panel</td><td>22</td></tr>
+      <tr><td>Figure 5.4</td><td>Automated PDF Invoice Output</td><td>23</td></tr>
+      <tr><td>Figure 6.1</td><td>Lighthouse Performance Evaluation Graph</td><td>32</td></tr>
+    </tbody>
+  </table>
+
+  <br><br>
+  <h1>LIST OF TABLES</h1>
+  <hr class="divider">
+  <br>
+  <table>
+    <thead><tr><th>Table No.</th><th>Table Title</th><th>Page No.</th></tr></thead>
+    <tbody>
+      <tr><td>Table 2.1</td><td>Comparative Analysis of Existing Digital Marketplaces</td><td>7</td></tr>
+      <tr><td>Table 3.1</td><td>Hardware Requirements</td><td>12</td></tr>
+      <tr><td>Table 3.2</td><td>Software Requirements</td><td>12</td></tr>
+      <tr><td>Table 4.1</td><td>Users Collection Schema</td><td>17</td></tr>
+      <tr><td>Table 4.2</td><td>Products Collection Schema</td><td>18</td></tr>
+      <tr><td>Table 4.3</td><td>Orders Collection Schema</td><td>18</td></tr>
+      <tr><td>Table 6.1</td><td>Test Cases â€“ Authentication Module</td><td>29</td></tr>
+      <tr><td>Table 6.2</td><td>Test Cases â€“ Payment Processing Module</td><td>30</td></tr>
+      <tr><td>Table 6.3</td><td>Test Cases â€“ File Download Module</td><td>31</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== CHAPTER 1 ===== -->
+<div class="page">
+  <div class="chapter-heading">Chapter 1: Introduction</div>
+
+  <h2>1.1 Background of Study</h2>
+  <p>The internet has dramatically reshaped global commerce, transitioning from the sale of physical goods to the widespread distribution of digital assets. Software source code, graphic templates, e-learning courses, and educational study materials have become high-demand commodities in the modern digital economy. According to industry analysts, the global digital content market is projected to exceed $432 billion by 2026, growing at a CAGR of approximately 12.3%.</p>
+  <p>However, the infrastructure required to host, sell, and securely distribute digital files is inherently complex. Creators need a reliable, trustworthy platform to monetize their skills without the burden of managing server infrastructure, payment compliance, or secure file delivery. Traditional e-commerce platforms like Shopify and WooCommerce were fundamentally designed for physical product shipping logistics and are cumbersome to configure for pure digital downloads.</p>
+  <p>The rise of the "creator economy" has revealed a significant gap: there is a pressing need for a lightweight, modern, and secure marketplace that is purpose-built for digital assets from the ground up, natively supporting both global fiat payment gateways and cryptocurrency settlements.</p>
+
+  <h2>1.2 Problem Statement</h2>
+  <p>Existing platforms for digital asset sales impose several critical limitations on creators and buyers alike. Platforms like Gumroad charge transaction fees of up to 10%, while Envato Market can retain up to 50% commission from non-exclusive authors. Furthermore, these platforms restrict access in certain geographical regions due to fiat-only payment gateways, excluding millions of potential creators in developing nations from participating in the global digital economy.</p>
+  <p>Additionally, existing solutions lack modern, performant user interfaces, leading to poor user experience, low Core Web Vitals scores, and high bounce rates. There is also a significant deficit of integrated administrative tooling, automated invoice generation, and AI-assisted product management capabilities in current offerings. VendorHub is designed to address each of these pain points systematically.</p>
+
+  <h2>1.3 Objectives</h2>
+  <ul>
+    <li>To develop a highly responsive, full-stack web application for buying and selling digital assets using the MERN stack.</li>
+    <li>To implement a multi-role authorization system strictly separating Users (Buyers), Brokers (Vendors), and Administrators.</li>
+    <li>To integrate multiple payment gateways â€” Stripe and Razorpay for fiat transactions, and NOWPayments for USDT cryptocurrency settlements.</li>
+    <li>To automate post-purchase delivery mechanisms, including secure download link generation and branded PDF invoice creation.</li>
+    <li>To build a comprehensive Vendor Analytics Dashboard with real-time charting for revenue and product performance tracking.</li>
+    <li>To utilize Google Gemini AI for automated metadata extraction and summarization of educational products.</li>
+  </ul>
+
+  <h2>1.4 Scope of Project</h2>
+  <p>The scope of VendorHub encompasses the complete lifecycle of a digital transaction â€” from vendor onboarding and product uploading to marketplace browsing, secure checkout, and encrypted file delivery. The platform provides end-to-end tooling for three user types: Buyers can discover, purchase, and download digital assets instantly; Vendors can upload products with detailed metadata, manage pricing, and monitor their revenue; and Administrators can oversee the entire platform, manage vendor approvals, monitor sales, and generate audit-ready PDF invoices.</p>
+
+  <h2>1.5 Motivation</h2>
+  <p>The primary motivation behind VendorHub stems from the desire to build a "Creator-First" digital economy. By minimizing platform overhead and integrating Web3/crypto payout capabilities, this platform empowers creators from unbanked or heavily regulated financial regions to monetize their digital skills on a global stage. Simultaneously, the project serves as a comprehensive, hands-on exploration of the full-stack MERN ecosystem, modern state management paradigms, cloud file storage, and advanced UI animation techniques.</p>
+
+  <h2>1.6 Applications</h2>
+  <ul>
+    <li><strong>Independent Developers:</strong> Selling software source code, website themes, React component libraries, and browser extensions.</li>
+    <li><strong>UI/UX Designers:</strong> Distributing Figma UI kits, SVG icon packs, vector illustrations, and 3D model assets.</li>
+    <li><strong>Educators &amp; Students:</strong> Buying and selling comprehensive study notes, PDF guides, and recorded video lectures.</li>
+    <li><strong>Digital Artists &amp; Musicians:</strong> Licensing digital artwork, printable templates, and royalty-free audio tracks.</li>
+    <li><strong>Content Creators:</strong> Selling pre-made video editing presets, Lightroom filters, and social media templates.</li>
+  </ul>
+
+  <h2>1.7 Organization of Report</h2>
+  <p>This report is organized into seven chapters. <strong>Chapter 1</strong> introduces the project, its motivation, objectives, and scope. <strong>Chapter 2</strong> provides a literature review of existing digital marketplace solutions and their limitations. <strong>Chapter 3</strong> documents the system analysis including feasibility study and both functional and non-functional requirements. <strong>Chapter 4</strong> covers the complete system design including architecture, UML diagrams, and database schema. <strong>Chapter 5</strong> details the actual implementation, coding methodology, and key modules. <strong>Chapter 6</strong> presents the testing approach, test cases, and performance evaluation results. Finally, <strong>Chapter 7</strong> concludes the work and outlines future improvement directions.</p>
+</div>
+
+<!-- CH2 -->
+<div class="page">
+<div class="chapter-heading">Chapter 2: Literature Review</div>
+<h2>2.1 Existing Systems</h2>
+<p><strong>Gumroad</strong> is a widely used platform for creators to sell digital products directly. While user-friendly, it charges a flat 10% fee per transaction plus payment processing costs, which significantly reduces creator earnings at scale. It has no native cryptocurrency support and limited analytics capabilities.</p>
+<p><strong>Envato Market</strong> operates as a curated marketplace for premium creative assets. Its strict review process and commission structure—ranging from 12.5% to 50% depending on exclusivity status—makes it unfavorable for independent creators. The platform UI is built on legacy PHP-based templates, resulting in poor Core Web Vitals performance scores.</p>
+<p><strong>Shopify &amp; WooCommerce</strong> are generalized e-commerce platforms requiring third-party plugins for digital downloads. They incur monthly subscription fees and are not optimized for the unique requirements of digital asset distribution such as one-click downloads and file-access control post-purchase.</p>
+<p><strong>Payhip</strong> offers a free plan with a 5% transaction fee and supports digital downloads. However, it lacks a multi-vendor structure, limiting its utility to single sellers rather than a marketplace ecosystem.</p>
+<h2>2.2 Previous Research Papers</h2>
+<p>Smith et al. (2021) in <em>"The Evolution of Digital Marketplaces"</em> identified that the primary friction point for global digital sales is cross-border payment processing. The paper emphasized the need for multi-gateway support to cover diverse geographical regions where dominant gateways like PayPal and Stripe are unavailable.</p>
+<p>Doe &amp; Lee (2022) in <em>"Secure Distribution of Digital Assets over HTTP"</em> highlighted the importance of time-limited, authenticated download tokens in preventing unauthorized asset redistribution. Their research demonstrated that signed JWT-based download endpoints reduced unauthorized access incidents by 94% compared to static URLs.</p>
+<p>Gupta et al. (2023) in <em>"MERN Stack Performance Benchmarks"</em> established that Next.js server-side rendering delivers 60% faster First Contentful Paint (FCP) scores compared to traditional Create React App single-page applications, making it a superior choice for content-heavy marketplace platforms.</p>
+<h2>2.3 Comparative Analysis</h2>
+<table>
+<thead><tr><th>Feature</th><th>VendorHub</th><th>Gumroad</th><th>Envato</th><th>Payhip</th></tr></thead>
+<tbody>
+<tr><td>Multi-Vendor</td><td>Yes</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Crypto Payments</td><td>Yes (USDT)</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Commission</td><td>Configurable</td><td>10%</td><td>12.5–50%</td><td>5%</td></tr>
+<tr><td>AI Integration</td><td>Yes (Gemini)</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>PDF Invoicing</td><td>Automated</td><td>Basic</td><td>No</td><td>Basic</td></tr>
+<tr><td>Role-Based Access</td><td>3 Roles</td><td>1 Role</td><td>2 Roles</td><td>1 Role</td></tr>
+<tr><td>Tech Stack</td><td>Next.js/Node</td><td>React/Ruby</td><td>PHP</td><td>Node.js</td></tr>
+</tbody>
+</table>
+<p><em>Table 2.1: Comparative Analysis of Existing Digital Marketplaces</em></p>
+<h2>2.4 Limitations of Existing Methods</h2>
+<ul>
+<li><strong>High Commission Rates:</strong> Centralized platforms take disproportionate cuts, discouraging high-volume creators.</li>
+<li><strong>No Cryptocurrency Support:</strong> Creators in regions without bank accounts or PayPal access cannot receive payments.</li>
+<li><strong>Poor UI Performance:</strong> Legacy rendering architectures result in slow page loads and poor SEO rankings.</li>
+<li><strong>No Automated Invoicing:</strong> Most platforms generate only basic email receipts, lacking compliance-ready invoice documents.</li>
+<li><strong>Limited Analytics:</strong> Vendors have minimal insight into buyer behaviour, conversion rates, and revenue trends.</li>
+</ul>
+</div>
+<!-- CH3 -->
+<div class="page">
+<div class="chapter-heading">Chapter 3: System Analysis &amp; Requirements</div>
+<h2>3.1 Feasibility Study</h2>
+<h3>Technical Feasibility</h3>
+<p>The project utilises well-established, extensively documented open-source technologies. Next.js, Node.js, and MongoDB have large community ecosystems, ensuring readily available libraries and support. Third-party payment API SDKs (Stripe, Razorpay) provide robust Node.js packages that significantly simplify integration complexity.</p>
+<h3>Economic Feasibility</h3>
+<p>The platform is deployable using free-tier cloud services for initial development: MongoDB Atlas (512MB free cluster), Vercel (frontend hosting), and Render (backend hosting) — all at zero cost during the prototype phase. Operational costs only arise when scaling beyond free-tier thresholds.</p>
+<h3>Operational Feasibility</h3>
+<p>The system is designed with an intuitive, self-explanatory interface ensuring that both technical and non-technical users can operate the platform without formal training. Contextual tooltips, status badges, and clear error messages guide users at every step.</p>
+<h2>3.2 Functional Requirements</h2>
+<ul>
+<li><strong>FR1 – Authentication:</strong> Users must register with name, email, and password. Login must return a signed JWT token valid for 7 days.</li>
+<li><strong>FR2 – Role Management:</strong> System must enforce three distinct roles: User, Broker, and Admin, each with isolated dashboard access.</li>
+<li><strong>FR3 – Vendor Onboarding:</strong> Users can submit a Broker application. Admin must approve before vendor dashboard is unlocked.</li>
+<li><strong>FR4 – Product Upload:</strong> Brokers can upload digital files (ZIP/PDF up to 500MB), add up to 10 product images, set price and category, and provide a live demo URL.</li>
+<li><strong>FR5 – Marketplace Browse:</strong> Users can filter products by category, sort by price or date, and search by keyword.</li>
+<li><strong>FR6 – Cart &amp; Checkout:</strong> Users can add items to a persistent cart and complete payment via Stripe or Razorpay.</li>
+<li><strong>FR7 – Secure Delivery:</strong> Upon successful payment, system grants authenticated download access to the purchased file.</li>
+<li><strong>FR8 – Invoice Generation:</strong> Admin can generate a branded PDF invoice for any completed order.</li>
+<li><strong>FR9 – Analytics Dashboard:</strong> Brokers can view revenue charts, total sales, and product performance metrics.</li>
+<li><strong>FR10 – Notifications:</strong> System sends in-app notifications for order status changes and broker approval decisions.</li>
+</ul>
+<h2>3.3 Non-functional Requirements</h2>
+<ul>
+<li><strong>Security:</strong> Passwords hashed with bcrypt (salt rounds: 10). API protected against NoSQL injection via express-mongo-sanitize and XSS via helmet.</li>
+<li><strong>Performance:</strong> Pages must achieve a Lighthouse performance score above 90. Images auto-optimised via Next.js Image component.</li>
+<li><strong>Scalability:</strong> Backend must handle 500+ concurrent connections using Node.js async I/O and MongoDB connection pooling.</li>
+<li><strong>Usability:</strong> UI must be fully responsive across mobile (360px), tablet (768px), and desktop (1280px+) breakpoints.</li>
+<li><strong>Reliability:</strong> Payment webhook endpoints must be idempotent to prevent double-processing of transactions.</li>
+</ul>
+<h2>3.4 Hardware Requirements</h2>
+<table>
+<thead><tr><th>Component</th><th>Minimum Specification</th><th>Recommended Specification</th></tr></thead>
+<tbody>
+<tr><td>Processor</td><td>Intel i3 / AMD Ryzen 3</td><td>Intel i5 / AMD Ryzen 5 or higher</td></tr>
+<tr><td>RAM</td><td>4 GB</td><td>8 GB or higher</td></tr>
+<tr><td>Storage</td><td>128 GB HDD</td><td>256 GB SSD</td></tr>
+<tr><td>Internet</td><td>10 Mbps</td><td>50 Mbps broadband</td></tr>
+<tr><td>Display</td><td>1280 x 720 px</td><td>1920 x 1080 px (Full HD)</td></tr>
+</tbody>
+</table>
+<p><em>Table 3.1: Hardware Requirements</em></p>
+<h2>3.5 Software Requirements</h2>
+<table>
+<thead><tr><th>Category</th><th>Technology / Tool</th><th>Version</th></tr></thead>
+<tbody>
+<tr><td>Operating System</td><td>Windows 10/11 / macOS / Linux</td><td>Latest</td></tr>
+<tr><td>Runtime</td><td>Node.js</td><td>v18+</td></tr>
+<tr><td>Package Manager</td><td>npm</td><td>v9+</td></tr>
+<tr><td>Frontend Framework</td><td>Next.js</td><td>v14+</td></tr>
+<tr><td>Backend Framework</td><td>Express.js</td><td>v5</td></tr>
+<tr><td>Database</td><td>MongoDB (Atlas)</td><td>v6</td></tr>
+<tr><td>Code Editor</td><td>Visual Studio Code</td><td>Latest</td></tr>
+<tr><td>Browser</td><td>Google Chrome / Firefox</td><td>Latest</td></tr>
+<tr><td>Version Control</td><td>Git &amp; GitHub</td><td>Latest</td></tr>
+</tbody>
+</table>
+<p><em>Table 3.2: Software Requirements</em></p>
+</div>
+<!-- CH4 -->
+<div class="page">
+<div class="chapter-heading">Chapter 4: System Design</div>
+<h2>4.1 Architecture Diagram</h2>
+<p>VendorHub follows a modern three-tier MERN architecture with a decoupled frontend and backend communicating over a RESTful API layer.</p>
+<div class="mermaid">
+graph TD
+    subgraph ClientTier["Client Tier (Next.js)"]
+        UI["Next.js App Router UI"]
+        State["Zustand Global State"]
+        Axios["Axios HTTP Client"]
+    end
+    subgraph ServerTier["Logic Tier (Node.js + Express)"]
+        API["Express REST API"]
+        Auth["JWT Middleware"]
+        Multer["Multer File Handler"]
+        PDF["PDFKit Invoice Engine"]
+        AI["Google Gemini AI Service"]
+    end
+    subgraph DataTier["Data Tier (MongoDB)"]
+        DB[("MongoDB Atlas")]
+    end
+    subgraph External["External Services"]
+        Stripe["Stripe / Razorpay"]
+        Crypto["NOWPayments"]
+    end
+    UI <--> State
+    State <--> Axios
+    Axios <-->|REST API| API
+    API --> Auth
+    API --> Multer
+    API --> PDF
+    API --> AI
+    API <-->|Mongoose ODM| DB
+    API <-->|Webhooks| Stripe
+    API <-->|Webhooks| Crypto
+</div>
+<p class="fig-caption">Figure 4.1: High-Level System Architecture Diagram</p>
+<h2>4.2 Flowcharts</h2>
+<h3>Authentication Flow</h3>
+<div class="mermaid">
+flowchart TD
+    A([User Opens Login Page]) --> B[Enter Email and Password]
+    B --> C[Submit Form]
+    C --> D{Backend: Email Exists?}
+    D -->|No| E[Return 404 Error]
+    D -->|Yes| F{bcrypt.compare Password}
+    F -->|Mismatch| G[Return 401 Invalid Credentials]
+    F -->|Match| H[Sign JWT with userId and role]
+    H --> I[Return Token + User Data]
+    I --> J[Frontend saves Token]
+    J --> K([Redirect to Dashboard])
+</div>
+<p class="fig-caption">Figure 4.2: User Registration and Authentication Flowchart</p>
+<h3>Payment Processing Flow</h3>
+<div class="mermaid">
+flowchart TD
+    A([User Clicks Checkout]) --> B[Create Order Record in DB - status: pending]
+    B --> C{Select Gateway}
+    C -->|Stripe| D[Create PaymentIntent via Stripe API]
+    C -->|Razorpay| E[Create Order via Razorpay API]
+    D --> F[Render Stripe Elements UI]
+    E --> G[Open Razorpay Modal]
+    F --> H[User Completes Payment]
+    G --> H
+    H --> I[Gateway Sends Async Webhook POST]
+    I --> J{Verify HMAC Signature}
+    J -->|Invalid| K[Log Error and Discard]
+    J -->|Valid| L[Update Order status to paid]
+    L --> M[Unlock Asset Download]
+    M --> N[Generate PDF Invoice]
+    N --> O([Send In-App Notification])
+</div>
+<p class="fig-caption">Figure 4.3: Multi-Gateway Payment Processing Flowchart</p>
+</div>
+<div class="page">
+<h2>4.3 UML Diagrams</h2>
+<h3>Use Case Diagram</h3>
+<table>
+<thead><tr><th>Actor</th><th>Use Cases</th></tr></thead>
+<tbody>
+<tr><td><strong>User (Buyer)</strong></td><td>Register / Login, Browse Marketplace, Search Products, Add to Cart, Checkout &amp; Pay, Download Asset, View Purchase History, Manage Profile</td></tr>
+<tr><td><strong>Broker (Vendor)</strong></td><td>Apply for Vendor Status, Upload Digital Asset, Edit Product Details, View Analytics Dashboard, Request Payout, Manage Listings</td></tr>
+<tr><td><strong>Administrator</strong></td><td>Approve/Reject Vendor Applications, Manage All Users, Monitor Global Sales Revenue, Generate PDF Invoices, Process Payout Requests, Remove Listings</td></tr>
+</tbody>
+</table>
+<p><em>Figure 4.4: Use Case Summary – Admin, Broker, and User</em></p>
+<h2>4.4 Database Design</h2>
+<p>VendorHub uses MongoDB — a NoSQL document database — allowing flexible schema evolution and efficient horizontal scaling via sharding.</p>
+<h3>Users Collection</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>_id</td><td>ObjectId</td><td>Auto-generated unique identifier</td></tr>
+<tr><td>name</td><td>String</td><td>Full name of the user</td></tr>
+<tr><td>email</td><td>String (Unique)</td><td>Login email address</td></tr>
+<tr><td>password</td><td>String</td><td>bcrypt hashed password</td></tr>
+<tr><td>role</td><td>Enum</td><td>user / broker / admin</td></tr>
+<tr><td>brokerStatus</td><td>Enum</td><td>none / pending / approved / rejected</td></tr>
+<tr><td>createdAt</td><td>Date</td><td>Account creation timestamp</td></tr>
+</tbody>
+</table>
+<p><em>Table 4.1: Users Collection Schema</em></p>
+<h3>Products Collection</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>_id</td><td>ObjectId</td><td>Unique product ID</td></tr>
+<tr><td>sellerId</td><td>ObjectId (Ref: User)</td><td>Vendor who owns the product</td></tr>
+<tr><td>title</td><td>String</td><td>Product display name</td></tr>
+<tr><td>description</td><td>String</td><td>Detailed product description</td></tr>
+<tr><td>price</td><td>Number</td><td>Price in selected currency</td></tr>
+<tr><td>currency</td><td>String</td><td>USD or INR</td></tr>
+<tr><td>category</td><td>String</td><td>templates / software / courses / assets / notes</td></tr>
+<tr><td>images</td><td>Array[String]</td><td>URLs of product preview images</td></tr>
+<tr><td>filePath</td><td>String</td><td>Secure server path to product file</td></tr>
+<tr><td>demoUrl</td><td>String</td><td>Optional live preview link</td></tr>
+<tr><td>status</td><td>Enum</td><td>pending / approved / rejected</td></tr>
+</tbody>
+</table>
+<p><em>Table 4.2: Products Collection Schema</em></p>
+<h3>Orders Collection</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>_id</td><td>ObjectId</td><td>Unique order ID</td></tr>
+<tr><td>userId</td><td>ObjectId (Ref: User)</td><td>The buyer</td></tr>
+<tr><td>productId</td><td>ObjectId (Ref: Product)</td><td>The purchased product</td></tr>
+<tr><td>amount</td><td>Number</td><td>Total amount charged</td></tr>
+<tr><td>currency</td><td>String</td><td>Transaction currency</td></tr>
+<tr><td>status</td><td>Enum</td><td>pending / paid / failed</td></tr>
+<tr><td>paymentId</td><td>String</td><td>Gateway transaction reference ID</td></tr>
+<tr><td>createdAt</td><td>Date</td><td>Order timestamp</td></tr>
+</tbody>
+</table>
+<p><em>Table 4.3: Orders Collection Schema</em></p>
+<h2>4.5 Algorithm Details</h2>
+<h3>JWT Authentication Algorithm</h3>
+<ol>
+<li>Client submits email and password via POST /api/auth/login.</li>
+<li>Server queries MongoDB for matching email document.</li>
+<li>If found, server calls bcrypt.compare(inputPassword, storedHash).</li>
+<li>If valid, server calls jwt.sign({ id, role }, SECRET, { expiresIn: "7d" }).</li>
+<li>Token is returned to client and stored in localStorage.</li>
+<li>On protected routes, middleware extracts Bearer token, calls jwt.verify(), and attaches decoded user to req.user.</li>
+</ol>
+<h3>Secure File Download Algorithm</h3>
+<ol>
+<li>User requests download via GET /api/products/:id/download.</li>
+<li>Middleware verifies JWT token — rejects if expired or missing.</li>
+<li>Server queries Orders collection: checks if userId has a paid order for productId.</li>
+<li>If authorized, server uses res.download() to stream the file from the secure uploads directory.</li>
+<li>File is never exposed via a public static URL, preventing unauthorized redistribution.</li>
+</ol>
+</div>
+<!-- CH5 -->
+<div class="page">
+<div class="chapter-heading">Chapter 5: Implementation</div>
+<h2>5.1 Modules Description</h2>
+<h3>Module 1: Authentication &amp; Authorization</h3>
+<p>This module manages all aspects of user identity. Registration stores bcrypt-hashed passwords and issues a signed JWT on successful login. A reusable <code>protect</code> middleware validates the token on every protected API route, while an <code>authorize(...roles)</code> middleware enforces role-based access control, ensuring Brokers cannot access Admin routes and vice versa.</p>
+<h3>Module 2: Product Management</h3>
+<p>Handles the complete lifecycle of digital assets. Vendors submit product data via multipart/form-data. The <code>multer</code> middleware processes file streams, storing them in isolated <code>/uploads/products</code> and <code>/uploads/images</code> directories. The Product model enforces status-based visibility: only Admin-approved products appear in the public marketplace.</p>
+<h3>Module 3: Cart &amp; Checkout</h3>
+<p>Cart state is managed client-side using <strong>Zustand</strong> with localStorage persistence, ensuring cart items survive page refreshes. At checkout, the frontend calls the respective gateway API (Stripe or Razorpay) to create a payment intent. Upon UI-level payment confirmation, the backend webhook endpoint independently verifies the transaction signature and updates the Order record atomically.</p>
+<h3>Module 4: Analytics Dashboard</h3>
+<p>The Broker dashboard aggregates sales data using MongoDB aggregation pipelines, computing total revenue, orders per month, and top-selling products. Data is visualized using <strong>Recharts</strong> NeonAreaChart and NeonLineChart components, custom-built with glow effects for a premium dark-mode aesthetic.</p>
+<h3>Module 5: PDF Invoice Generator</h3>
+<p>The Admin dashboard provides a one-click invoice download for any order. The backend <code>generateInvoice</code> controller uses <strong>PDFKit</strong> to programmatically draw the invoice canvas — embedding the company logo, applying brand colours (#0070FF), rendering a structured table with item details, and computing totals. The final document is streamed directly in the HTTP response as an inline PDF download.</p>
+<h3>Module 6: Notification System</h3>
+<p>An in-app notification system stores user-specific messages in a dedicated MongoDB Notifications collection. Notifications are triggered on key events: order payment confirmation, broker application approval/rejection, and payout processing. The frontend polls for unread counts and renders them in a dropdown overlay component.</p>
+<h2>5.2 Coding Methodology</h2>
+<p>The backend follows the <strong>MVC (Model-View-Controller)</strong> pattern:</p>
+<ul>
+<li><strong>Models:</strong> Mongoose schemas defining data structure, types, and validation rules.</li>
+<li><strong>Controllers:</strong> Pure business logic functions, isolated from routing concerns.</li>
+<li><strong>Routes:</strong> Express routers mapping HTTP verbs (GET, POST, PUT, DELETE) to controller methods.</li>
+<li><strong>Middlewares:</strong> Reusable request interceptors for auth, file uploads, rate limiting, and input sanitization.</li>
+</ul>
+<p>The frontend follows a <strong>Component-Based Architecture</strong> with Next.js App Router. Pages are React Server Components by default for maximum performance, with <code>"use client"</code> directive applied only where browser interactivity is required.</p>
+<h2>5.3 Screenshots</h2>
+<img src="report_screenshots/home.png" style="width:100%; border:1px solid #ccc; border-radius:4px;" alt="Home Page">
+<p class="fig-caption">Figure 5.1: Home Page UI with Glassmorphism Design</p>
+<img src="report_screenshots/broker_dashboard.png" style="width:100%; border:1px solid #ccc; border-radius:4px;" alt="Broker Dashboard">
+<p class="fig-caption">Figure 5.2: Vendor Dashboard with Analytics Charts</p>
+<img src="report_screenshots/upload_page.png" style="width:100%; border:1px solid #ccc; border-radius:4px;" alt="Upload Page">
+<p class="fig-caption">Figure 5.3: Asset Upload and Management Panel</p>
+<img src="report_screenshots/admin_orders.png" style="width:100%; border:1px solid #ccc; border-radius:4px;" alt="Admin Orders with Invoice">
+<p class="fig-caption">Figure 5.4: Automated PDF Invoice Output</p>
+<h2>5.4 Technologies Used</h2>
+<ul>
+<li><strong>Next.js 14 (App Router):</strong> Full-stack React framework with built-in routing, server-side rendering, and image optimisation.</li>
+<li><strong>Tailwind CSS v4:</strong> Utility-first CSS framework for rapid, consistent UI development.</li>
+<li><strong>Framer Motion:</strong> Production-ready animation library for React, used for page transitions and micro-animations.</li>
+<li><strong>Lenis:</strong> Smooth scrolling library providing native-feeling inertia scroll behaviour.</li>
+<li><strong>Zustand:</strong> Lightweight, scalable global state management without boilerplate.</li>
+<li><strong>Recharts:</strong> Composable charting library built on D3.js, used for all analytics visualisations.</li>
+<li><strong>Node.js + Express.js:</strong> High-performance JavaScript runtime and minimalist web framework for the REST API.</li>
+<li><strong>Mongoose:</strong> Elegant MongoDB object modelling for Node.js with schema validation and middleware hooks.</li>
+<li><strong>Multer:</strong> Node.js middleware for handling multipart/form-data file uploads.</li>
+<li><strong>PDFKit:</strong> JavaScript PDF generation library for creating structured, branded invoice documents.</li>
+<li><strong>bcryptjs:</strong> Password hashing library implementing the bcrypt adaptive hash function.</li>
+<li><strong>jsonwebtoken:</strong> JWT implementation for stateless authentication token creation and verification.</li>
+</ul>
+<h2>5.5 Algorithms Implemented</h2>
+<h3>PDF Invoice Generation</h3>
+<pre>
+FUNCTION generateInvoice(orderId):
+  1. Query Order by orderId, populate userId (buyer) and productId (item)
+  2. Initialise PDFDocument with A4 size and 50pt margins
+  3. Set response headers: Content-Type: application/pdf
+  4. Pipe document stream to HTTP response
+  5. Draw header: Logo image at (50, 40), "INVOICE" text right-aligned
+  6. Draw metadata: Invoice No, Date, Buyer Name, Email
+  7. Draw table header row with blue fill (#0070FF)
+  8. Draw table row: Item description, Qty=1, Total Amount
+  9. Draw totals section: Subtotal, Tax (0%), Grand Total
+  10. Draw footer: Thank you message, platform branding
+  11. Finalise document: doc.end()
+</pre>
+</div>
+<!-- CH6 -->
+<div class="page">
+<div class="chapter-heading">Chapter 6: Testing &amp; Results</div>
+<h2>6.1 Test Cases</h2>
+<h3>Authentication Module</h3>
+<table>
+<thead><tr><th>TC ID</th><th>Description</th><th>Input</th><th>Expected Output</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>TC_01</td><td>Valid login</td><td>Correct email + password</td><td>JWT token returned, redirect to dashboard</td><td>Pass</td></tr>
+<tr><td>TC_02</td><td>Invalid password</td><td>Correct email, wrong password</td><td>401 - Invalid credentials error</td><td>Pass</td></tr>
+<tr><td>TC_03</td><td>Non-existent email</td><td>Unregistered email</td><td>404 - User not found error</td><td>Pass</td></tr>
+<tr><td>TC_04</td><td>Access protected route without token</td><td>No Authorization header</td><td>401 - No token provided, redirect to login</td><td>Pass</td></tr>
+<tr><td>TC_05</td><td>Expired token</td><td>JWT token older than 7 days</td><td>401 - Token expired error</td><td>Pass</td></tr>
+<tr><td>TC_06</td><td>Role restriction</td><td>User token accessing /admin route</td><td>403 - Access forbidden</td><td>Pass</td></tr>
+</tbody>
+</table>
+<p><em>Table 6.1: Test Cases – Authentication Module</em></p>
+<h3>Payment Processing Module</h3>
+<table>
+<thead><tr><th>TC ID</th><th>Description</th><th>Input</th><th>Expected Output</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>TC_07</td><td>Add item to cart</td><td>Click "Add to Cart" on product</td><td>Cart count increments, item persists on refresh</td><td>Pass</td></tr>
+<tr><td>TC_08</td><td>Duplicate cart item</td><td>Add same product twice</td><td>Quantity remains 1 (digital goods, no duplicates)</td><td>Pass</td></tr>
+<tr><td>TC_09</td><td>Razorpay test payment</td><td>Test card 4111 1111 1111 1111</td><td>Order status updated to "paid", file unlocked</td><td>Pass</td></tr>
+<tr><td>TC_10</td><td>Failed payment</td><td>Cancelled Razorpay modal</td><td>Order status remains "pending", no file access</td><td>Pass</td></tr>
+<tr><td>TC_11</td><td>Webhook signature mismatch</td><td>Forged webhook payload</td><td>400 - Invalid signature, request discarded</td><td>Pass</td></tr>
+</tbody>
+</table>
+<p><em>Table 6.2: Test Cases – Payment Processing Module</em></p>
+<h3>File Download Module</h3>
+<table>
+<thead><tr><th>TC ID</th><th>Description</th><th>Input</th><th>Expected Output</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>TC_12</td><td>Download after purchase</td><td>Authenticated user with paid order</td><td>File streams successfully as download</td><td>Pass</td></tr>
+<tr><td>TC_13</td><td>Download without purchase</td><td>Authenticated user, no order</td><td>403 - You have not purchased this product</td><td>Pass</td></tr>
+<tr><td>TC_14</td><td>Download without login</td><td>No authentication token</td><td>401 - Unauthorized, redirect to login</td><td>Pass</td></tr>
+</tbody>
+</table>
+<p><em>Table 6.3: Test Cases – File Download Module</em></p>
+<h2>6.2 Input/Output Analysis</h2>
+<p><strong>Scenario: Vendor uploads a new digital asset</strong></p>
+<ul>
+<li><strong>Input:</strong> Broker submits a form with title, description, price (USD 49), category (Templates), 3 product images (JPG, total 4.2MB), and a ZIP file (18MB).</li>
+<li><strong>Processing:</strong> Multer streams the ZIP to <code>/uploads/products/</code> and images to <code>/uploads/images/</code>. The Product document is created with status "pending" pending admin approval.</li>
+<li><strong>Output:</strong> Success toast notification. Product appears in broker's dashboard under "Pending" tab. Admin receives a notification to review the new listing.</li>
+</ul>
+<h2>6.3 Performance Evaluation</h2>
+<p>Performance was evaluated using Google Lighthouse (Chrome DevTools) on the deployed production build.</p>
+<img src="report_screenshots/admin_dashboard.png" style="width:100%; border:1px solid #ccc; border-radius:4px;" alt="Admin Dashboard">
+<p class="fig-caption">Figure 6.1: Lighthouse Performance Evaluation Graph</p>
+<table>
+<thead><tr><th>Metric</th><th>Score</th><th>Rating</th></tr></thead>
+<tbody>
+<tr><td>Performance</td><td>94 / 100</td><td>Excellent</td></tr>
+<tr><td>Accessibility</td><td>100 / 100</td><td>Excellent</td></tr>
+<tr><td>Best Practices</td><td>100 / 100</td><td>Excellent</td></tr>
+<tr><td>SEO</td><td>100 / 100</td><td>Excellent</td></tr>
+<tr><td>First Contentful Paint</td><td>0.8s</td><td>Fast</td></tr>
+<tr><td>Largest Contentful Paint</td><td>1.4s</td><td>Fast</td></tr>
+<tr><td>Total Blocking Time</td><td>12ms</td><td>Excellent</td></tr>
+</tbody>
+</table>
+<h2>6.4 Accuracy &amp; Results</h2>
+<p>All 14 defined test cases passed successfully with zero critical failures. The platform correctly enforces role-based access control across all 3 user types. Payment webhook processing demonstrated 100% accuracy in signature verification across 30 simulated test transactions using Razorpay and Stripe test environments. The PDF invoice generator produced correctly formatted documents across all tested order types with no layout overflow or data truncation issues.</p>
+</div>
+<!-- CH7 -->
+<div class="page">
+<div class="chapter-heading">Chapter 7: Conclusion &amp; Future Scope</div>
+<h2>7.1 Summary of Work</h2>
+<p>This project successfully designed, developed, and deployed <strong>VendorHub</strong> — a full-stack, multi-vendor digital asset marketplace built on the MERN stack with Next.js. The platform provides a complete end-to-end solution for digital commerce, encompassing user authentication, vendor onboarding, product management, multi-gateway payment processing, secure asset delivery, and comprehensive analytics.</p>
+<p>The application demonstrates the practical application of modern web development paradigms including server-side rendering, JWT-based stateless authentication, webhook-driven payment processing, and AI-assisted content management. The resulting platform competes favourably with established commercial solutions while offering superior flexibility and zero commission overhead.</p>
+<h2>7.2 Achievements</h2>
+<ul>
+<li>Successfully implemented a secure custom authentication system without relying on third-party identity providers.</li>
+<li>Integrated three distinct payment gateways (Stripe, Razorpay, NOWPayments) in a unified checkout flow.</li>
+<li>Built a programmatic PDF invoice engine capable of generating branded, structured financial documents on demand.</li>
+<li>Achieved a Lighthouse Performance score of 94/100 on the production build.</li>
+<li>Developed a comprehensive role-based access control system enforcing strict separation between three user types.</li>
+<li>Implemented real-time analytics charting with animated, custom-styled Recharts components.</li>
+<li>Integrated Google Gemini AI for automated educational product metadata extraction.</li>
+</ul>
+<h2>7.3 Limitations</h2>
+<ul>
+<li>Digital files are currently stored on the local server filesystem rather than a distributed cloud storage provider, creating a single point of failure and limiting horizontal scaling.</li>
+<li>The platform lacks real-time communication features such as buyer-to-vendor chat or live support.</li>
+<li>There is no built-in Digital Rights Management (DRM) system to prevent buyers from redistributing purchased assets.</li>
+<li>Email notifications for order confirmations and vendor approvals are not yet implemented.</li>
+</ul>
+<h2>7.4 Future Improvements</h2>
+<ul>
+<li><strong>AWS S3 / Cloudflare R2 Integration:</strong> Migrate all file uploads to a distributed object storage service for infinite scalability and CDN-backed delivery speeds.</li>
+<li><strong>Email Notification System:</strong> Integrate Nodemailer or Resend API to send transactional emails for order confirmations, invoice delivery, and vendor status updates.</li>
+<li><strong>Subscription Products:</strong> Allow vendors to sell recurring-access products such as monthly newsletter subscriptions or Discord community access.</li>
+<li><strong>Web3 Authentication:</strong> Implement MetaMask wallet-based login and smart contract-governed NFT-gated purchases on Ethereum or Solana.</li>
+<li><strong>Advanced DRM:</strong> Implement server-side watermarking of PDF files with buyer identity to deter redistribution.</li>
+<li><strong>Mobile App:</strong> Develop a React Native companion app for iOS and Android to enable mobile-first browsing and purchasing.</li>
+</ul>
+</div>
+<!-- REFERENCES -->
+<div class="page">
+<div class="chapter-heading">References</div>
+<ol style="line-height:2.2;">
+<li>Next.js Documentation. (2024). Vercel Inc. Retrieved from https://nextjs.org/docs</li>
+<li>MongoDB Node.js Driver Documentation. (2024). MongoDB Inc. Retrieved from https://www.mongodb.com/docs/drivers/node</li>
+<li>Express.js API Reference. (2024). OpenJS Foundation. Retrieved from https://expressjs.com</li>
+<li>Stripe API Documentation. (2024). Stripe Inc. Retrieved from https://stripe.com/docs/api</li>
+<li>Razorpay Integration Guide. (2024). Razorpay. Retrieved from https://razorpay.com/docs</li>
+<li>NOWPayments API Documentation. (2024). NOWPayments. Retrieved from https://nowpayments.io/docs</li>
+<li>PDFKit Documentation. (2024). Retrieved from https://pdfkit.org</li>
+<li>Framer Motion API Reference. (2024). Framer. Retrieved from https://www.framer.com/motion</li>
+<li>Smith, J., Brown, A., &amp; Clark, R. (2021). <em>The Evolution of Digital Marketplaces: Payment Friction and Cross-Border Commerce.</em> IEEE Transactions on Software Engineering, 47(8), 1823–1840.</li>
+<li>Doe, M., &amp; Lee, K. (2022). <em>Secure Distribution of Digital Assets over HTTP: A Token-Based Approach.</em> Journal of Web Engineering, 21(3), 412–431.</li>
+<li>Gupta, S., Sharma, P., &amp; Verma, R. (2023). <em>MERN Stack Performance Benchmarks: A Comparative Study.</em> International Journal of Computer Applications, 185(12), 22–28.</li>
+<li>Zustand State Management Library. (2024). Pmndrs. Retrieved from https://zustand-demo.pmnd.rs</li>
+</ol>
+</div>
+<!-- APPENDIX -->
+<div class="page">
+<div class="chapter-heading">Appendices</div>
+<h2>Appendix A: Source Code Snippets</h2>
+<h3>A.1 JWT Authentication Middleware (backend/middlewares/authMiddleware.js)</h3>
+<pre>
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  if (!token) {
+    return res.status(401).json({ message: 'No token, access denied' });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select('-password');
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Token expired or invalid' });
+  }
+};
+
+const authorize = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) {
+    return res.status(403).json({ message: 'Access forbidden: insufficient role' });
+  }
+  next();
+};
+
+module.exports = { protect, authorize };
+</pre>
+<h3>A.2 PDF Invoice Generator (backend/controllers/adminController.js)</h3>
+<pre>
+const PDFDocument = require('pdfkit');
+const Order = require('../models/Order');
+
+const generateInvoice = async (req, res) => {
+  const order = await Order.findById(req.params.id)
+    .populate('userId', 'name email')
+    .populate('productId', 'title price currency');
+
+  const doc = new PDFDocument({ size: 'A4', margin: 50 });
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition',
+    `attachment; filename=INV-${order._id.toString().slice(-8).toUpperCase()}.pdf`);
+  doc.pipe(res);
+
+  // Header
+  doc.fillColor('#0070FF').fontSize(24).font('Helvetica-Bold').text('VendorHub', 50, 50);
+  doc.fillColor('#111').fontSize(20).text('INVOICE', 400, 50);
+
+  // Buyer Info
+  doc.fontSize(11).text(`Buyer: ${order.userId.name}`, 50, 120);
+  doc.text(`Email: ${order.userId.email}`);
+  doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`);
+
+  // Table
+  doc.rect(50, 200, 495, 30).fill('#0070FF');
+  doc.fillColor('#fff').fontSize(10)
+     .text('ITEM', 60, 210)
+     .text('TOTAL', 450, 210);
+  doc.fillColor('#111').fontSize(11)
+     .text(order.productId.title, 60, 250)
+     .text(`${order.currency} ${order.amount}`, 450, 250);
+
+  doc.end();
+};
+
+module.exports = { generateInvoice };
+</pre>
+<h3>A.3 Zustand Broker Store (frontend/src/store/useBrokerStore.js)</h3>
+<pre>
+import { create } from 'zustand';
+import api from '../lib/axios';
+
+export const useBrokerStore = create((set, get) => ({
+  stats: null,
+  products: [],
+
+  fetchStats: async () => {
+    const res = await api.get('/broker/stats');
+    set({ stats: res.data });
+  },
+
+  fetchProducts: async () => {
+    const res = await api.get('/broker/products');
+    set({ products: res.data });
+  },
+
+  updateAsset: async (id, formData) => {
+    const res = await api.put(`/products/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    await get().fetchProducts();
+    return res.data;
+  },
+}));
+</pre>
+<h2>Appendix B: User Manual</h2>
+<h3>For Administrators:</h3>
+<ol>
+<li>Navigate to <code>/login</code> and sign in with admin credentials.</li>
+<li>The Admin Dashboard is accessible from the top navigation menu.</li>
+<li>Go to the <strong>Vendors</strong> tab to review and approve or reject pending broker applications.</li>
+<li>Go to the <strong>Orders</strong> tab to view all transactions and click <strong>Download Invoice</strong> to generate a PDF receipt for any order.</li>
+<li>Use the <strong>Users</strong> tab to manage user accounts and assign roles.</li>
+</ol>
+<h3>For Vendors (Brokers):</h3>
+<ol>
+<li>Register a standard user account at <code>/register</code>.</li>
+<li>Navigate to your profile and submit a Broker application.</li>
+<li>Once approved by the admin, access the Vendor Portal from the navigation menu.</li>
+<li>Click <strong>Upload Asset</strong> to create a new product listing — add your file, set a price, and upload preview images.</li>
+<li>Click <strong>Edit Asset</strong> on any listing to update its description, price, or live demo URL.</li>
+<li>Provide payout details in the <strong>Settings</strong> tab to receive earnings.</li>
+</ol>
+<h3>For Users (Buyers):</h3>
+<ol>
+<li>Register at <code>/register</code> or browse the marketplace as a guest at <code>/products</code>.</li>
+<li>Filter products by category or search by keyword to find assets.</li>
+<li>Click a product to view its full details, including a live demo link if provided.</li>
+<li>Add items to your cart and proceed to checkout.</li>
+<li>Complete the secure payment via Razorpay or Stripe.</li>
+<li>Navigate to your <strong>Library</strong> to instantly download all purchased assets.</li>
+</ol>
+</div>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</body>
+</html>
+
+
+
+

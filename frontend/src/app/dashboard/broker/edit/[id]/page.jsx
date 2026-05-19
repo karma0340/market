@@ -6,7 +6,7 @@ import {
   Package, Upload, Globe, DollarSign, 
   Layout, FileText, Sparkles, ArrowLeft, 
   Image as ImageIcon, Clipboard, CheckCircle2,
-  FolderOpen, Smartphone, Zap, ChevronRight, Github
+  FolderOpen, Smartphone, Zap, ChevronRight, Github, Edit
 } from 'lucide-react';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
@@ -73,24 +73,6 @@ export default function EditProductPage() {
     if (id) fetchProduct();
   }, [id, router]);
 
-  // Handle Clipboard Paste for Images
-  useEffect(() => {
-    const handlePaste = async (e) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf("image") !== -1) {
-          const blob = items[i].getAsFile();
-          handleImageFile(blob);
-        }
-      }
-    };
-
-    window.addEventListener('paste', handlePaste);
-    return () => window.removeEventListener('paste', handlePaste);
-  }, [existingImages.length, imageFiles.length]);
-
   const handleImageFile = (newFile) => {
     if (!newFile) return;
     if (newFile.size > 5 * 1024 * 1024) {
@@ -111,6 +93,26 @@ export default function EditProductPage() {
     };
     reader.readAsDataURL(newFile);
   };
+
+  // Handle Clipboard Paste for Images
+  useEffect(() => {
+    const handlePaste = async (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const blob = items[i].getAsFile();
+          handleImageFile(blob);
+        }
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [existingImages.length, imageFiles.length]);
+
+
 
   const removeNewImage = (index) => {
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
